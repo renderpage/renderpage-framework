@@ -35,11 +35,23 @@ if (!defined('APP_DIR')) {
 /**
  * Load always needed external class files
  */
+require_once RENDERPAGE_DIR . '/RenderPageAutoloader.php';
 require_once RENDERPAGE_DIR . '/RenderPageException.php';
 require_once RENDERPAGE_DIR . '/Route.php';
 require_once RENDERPAGE_DIR . '/Model.php';
 require_once RENDERPAGE_DIR . '/View.php';
 require_once RENDERPAGE_DIR . '/Controller.php';
+
+/**
+ * Autoloader
+ */
+spl_autoload_register(['\renderpage\libs\RenderPageAutoloader', 'autoload']);
+
+/**
+ * Errors
+ */
+set_exception_handler(['\renderpage\libs\RenderPageException', 'exceptionHandler']);
+set_error_handler(['\renderpage\libs\RenderPageException', 'errorHandler']);
 
 /**
  * This is the main RenderPage class
@@ -78,26 +90,6 @@ class RenderPage
     public function __construct()
     {
         include_once APP_DIR . '/config.php';
-
-        // Errors
-        set_exception_handler(['\renderpage\libs\RenderPageException', 'exceptionHandler']);
-        set_error_handler(['\renderpage\libs\RenderPageException', 'errorHandler']);
-
-        // Autoloader
-        spl_autoload_register(array(__CLASS__, 'autoload'));
-    }
-    
-    /**
-     * Autoload classes.
-     *
-     * @param string $class class name.
-     */
-    public static function autoload($class)
-    {
-        $filename = dirname(APP_DIR) . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
-        if (file_exists($filename)) {
-            include_once $filename;
-        }
     }
 
     /**
@@ -126,6 +118,12 @@ class RenderPage
     public function execute()
     {
         if (!empty($this->controller)) {
+            // Prepare controller
+            if (method_exists($this->controller, 'prepare')) {
+                $this->controller->prepare();
+            }
+
+            // Action run
             $this->outputData = $this->controller->{$this->route->actionName}($this->route->params);
         }
     }

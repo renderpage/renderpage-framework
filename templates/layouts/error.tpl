@@ -24,5 +24,7 @@
     </style>
   <body>
     {workarea}
+    <hr>
+    <p>RenderPage {#VERSION}</p>
   </body>
 </html>

@@ -183,6 +183,12 @@ class View
         // Output
         ob_start();
         include $compileFilename;
+
+        // Check compiler version
+        if ($rpVersion != RenderPage::RENDERPAGE_VERSION) {
+            unlink($compileFilename);
+        }
+
         return ob_get_clean();
     }
 }
