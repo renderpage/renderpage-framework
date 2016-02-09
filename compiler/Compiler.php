@@ -71,6 +71,35 @@ class Compiler
     }
 
     /**
+     * Code optimization
+     */
+    public function optimization()
+    {
+        $this->compileData = str_replace('?><?php', '', $this->compileData);
+    }
+
+    /**
+     * Write compile file
+     *
+     * @param string $filename pattern for replace
+     *
+     * @return int
+     */
+    public function writeFile($filename, $data)
+    {
+        $dir = dirname($filename);
+        if (!is_dir($dir)) {
+            mkdir($dir);
+        }
+
+        if (is_writable($dir)) {
+            return file_put_contents($filename, $data, LOCK_EX);
+        }
+
+        return 0;
+    }
+
+    /**
      * Compile Block
      *
      * @param object $view instance of View class
@@ -143,13 +172,20 @@ class Compiler
 
         $this->compileData = $this->compileBlock($view, $this->compileData);
 
+        // Add version
+        $this->compileData = '<?php $rpVersion = "' .
+                       RenderPage::RENDERPAGE_VERSION .
+                       '"; ?>' . $this->compileData;
+
         // Add compile comment
-        $compileData = '<?php /* RenderPage version: ' .
+        $this->compileData = '<?php /* RenderPage version: ' .
                        RenderPage::RENDERPAGE_VERSION . ', ' .
                        'created on ' . date('c') .
                        ' */ ?>' . $this->compileData;
 
+        $this->optimization();
+
         // Write compile file
-        return file_put_contents($view->getCompileFilename($template, $layout), $this->compileData);
+        return $this->writeFile($view->getCompileFilename($template, $layout), $this->compileData);
     }
 }
