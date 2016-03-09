@@ -45,6 +45,13 @@ class View
     public $extension = '.tpl';
 
     /**
+     * Instance of Language class
+     *
+     * @var object
+     */
+    public $language;
+
+    /**
      * Template variables
      *
      * @var array
@@ -56,9 +63,13 @@ class View
      */
     public function __construct()
     {
+        // Debug mode
         if (RENDERPAGE_DEBUG) {
             $this->forceCompile = true;
         }
+
+        // Create instance of Language class
+        $this->language = Language::getInstance();
     }
 
     /**

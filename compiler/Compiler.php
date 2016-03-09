@@ -75,7 +75,7 @@ class Compiler
      */
     public function optimization()
     {
-        $this->compileData = str_replace('?><?php', '', $this->compileData);
+        $this->compileData = str_replace('?><?php ', '', $this->compileData);
     }
 
     /**

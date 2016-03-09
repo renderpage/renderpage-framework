@@ -31,4 +31,17 @@ class Controller
         // Create instance of View class
         $this->view = new View;
     }
+
+    /**
+     * Allias for $this->view->language->_($category, $str)
+     *
+     * @param string $category
+     * @param string $str
+     *
+     * @return string
+     */
+    public function _($category, $str)
+    {
+        return $this->view->language->_($category, $str);
+    }
 }

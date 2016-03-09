@@ -38,6 +38,7 @@ if (!defined('APP_DIR')) {
 require_once RENDERPAGE_DIR . '/RenderPageAutoloader.php';
 require_once RENDERPAGE_DIR . '/RenderPageException.php';
 require_once RENDERPAGE_DIR . '/Route.php';
+require_once RENDERPAGE_DIR . '/Language.php';
 require_once RENDERPAGE_DIR . '/Model.php';
 require_once RENDERPAGE_DIR . '/View.php';
 require_once RENDERPAGE_DIR . '/Controller.php';

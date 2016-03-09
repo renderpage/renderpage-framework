@@ -24,6 +24,7 @@ class RenderPageAutoloader
     public static function autoload($class)
     {
         $filename = dirname(APP_DIR) . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
+
         if (file_exists($filename)) {
             include_once $filename;
         }
