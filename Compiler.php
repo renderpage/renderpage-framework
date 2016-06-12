@@ -94,6 +94,8 @@ class Compiler
 
         if (is_writable($dir)) {
             return file_put_contents($filename, $data, LOCK_EX);
+        } else {
+            die("{$filename} is not writable");
         }
 
         return 0;
@@ -187,5 +189,30 @@ class Compiler
 
         // Write compile file
         return $this->writeFile($view->getCompileFilename($template, $layout), $this->compileData);
+    }
+
+    /**
+     * Compile languages
+     */
+    public function compileLanguages($compileFilename)
+    {
+        $strings = [];
+
+        foreach (glob(APP_DIR . '/languages/*/*.xml') as $filename) {
+            $code = basename(dirname($filename));
+            $category = basename($filename, ".xml");
+
+            $xml = simplexml_load_file($filename);
+
+            foreach ($xml->children() as $child) {
+                $attributes = $child->attributes();
+                $strings[$code][$category][(string)$attributes->name] = (string)$child[0];
+            }
+
+            $data = "<?php return " . var_export($strings, true) . ";";
+
+            // Write compile file
+            $this->writeFile($compileFilename, $data);
+        }
     }
 }

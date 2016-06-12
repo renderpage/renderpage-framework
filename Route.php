@@ -66,6 +66,13 @@ class Route
     public $actionName = '';
 
     /**
+     * Language name
+     *
+     * @var string
+     */
+    public $language = '';
+
+    /**
      * Route match params
      *
      * @var array
@@ -186,6 +193,9 @@ class Route
                         $this->controllerName = $controllerName;
                         $this->actionName = $actionName;
                         $this->params = $matches;
+                        if (!empty($matches['language'])) {
+                            $this->language = $matches['language'];
+                        }
                         return true;
                     }
                 }

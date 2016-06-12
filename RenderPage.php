@@ -33,12 +33,21 @@ if (!defined('APP_DIR')) {
 }
 
 /**
+ * Absolute path to compiled files.
+ */
+if (!defined('COMPILE_DIR')) {
+    define('COMPILE_DIR', APP_DIR . '/compile');
+}
+
+/**
  * Load always needed external class files
  */
+require_once RENDERPAGE_DIR . '/traits/Singleton.php';
 require_once RENDERPAGE_DIR . '/RenderPageAutoloader.php';
 require_once RENDERPAGE_DIR . '/RenderPageException.php';
 require_once RENDERPAGE_DIR . '/Route.php';
 require_once RENDERPAGE_DIR . '/Language.php';
+require_once RENDERPAGE_DIR . '/DB.php';
 require_once RENDERPAGE_DIR . '/Model.php';
 require_once RENDERPAGE_DIR . '/View.php';
 require_once RENDERPAGE_DIR . '/Controller.php';
@@ -63,6 +72,20 @@ class RenderPage
      * RenderPage version
      */
     const RENDERPAGE_VERSION = '1.0.0a';
+
+    /**
+     * Recompile every time
+     *
+     * @var boolean
+     */
+    public static $forceCompile = false;
+
+    /**
+     * Instance of Language class
+     *
+     * @var object
+     */
+    public $language;
 
     /**
      * Route instance
@@ -90,7 +113,13 @@ class RenderPage
      */
     public function __construct()
     {
-        include_once APP_DIR . '/config.php';
+        // Debug mode
+        if (RENDERPAGE_DEBUG) {
+            self::$forceCompile = true;
+        }
+
+        // Create instance of Language class
+        $this->language = Language::getInstance();
     }
 
     /**

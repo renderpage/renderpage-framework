@@ -17,11 +17,29 @@ namespace renderpage\libs;
 class Model
 {
     /**
+     * Instance of Language class
+     *
+     * @var object
+     */
+    public $language;
+
+    /**
+     * Instance of DB class
+     *
+     * @var object
+     */
+    public $db;
+
+    /**
      * Init
      */
     public function __construct()
     {
-        // none
+        // Create instance of Language class
+        $this->language = Language::getInstance();
+
+        // Create instance of DB class
+        $this->db = DB::getInstance();
     }
 
     /**

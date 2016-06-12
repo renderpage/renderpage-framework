@@ -17,6 +17,13 @@ namespace renderpage\libs;
 class Controller
 {
     /**
+     * Instance of Language class
+     *
+     * @var object
+     */
+    public $language;
+
+    /**
      * Instance of View class
      *
      * @var object
@@ -28,6 +35,9 @@ class Controller
      */
     public function __construct()
     {
+        // Create instance of Language class
+        $this->language = Language::getInstance();
+
         // Create instance of View class
         $this->view = new View;
     }

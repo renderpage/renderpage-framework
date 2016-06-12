@@ -8,9 +8,7 @@
  */
 function RPCompileLang($params)
 {
-    $output = "<?php echo \$this->language->_('{$params[3]}', '{$params[4]}'); ?>";
-    return $output;
+    return "<?php echo \$this->language->_('{$params[3]}', '{$params[4]}'); ?>";
 }
 
 $this->addReplaceInstruction('["|\'](.*?)\.(.*?)["|\']', 'RPCompileLang');
-

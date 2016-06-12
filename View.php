@@ -17,25 +17,11 @@ namespace renderpage\libs;
 class View
 {
     /**
-     * Recompile templates every time
-     *
-     * @var boolean
-     */
-    public $forceCompile = false;
-
-    /**
      * Template directory
      *
      * @var string
      */
     public $templateDir = 'templates';
-
-    /**
-     * Compile directory
-     *
-     * @var string
-     */
-    public $compileDir = 'compile';
 
     /**
      * Template extension
@@ -56,18 +42,16 @@ class View
      *
      * @var array
      */
-    private $variables = [];
+    private $variables = [
+        'cssFiles' => [],
+        'jsFiles' => []
+    ];
 
     /**
      * Init
      */
     public function __construct()
     {
-        // Debug mode
-        if (RENDERPAGE_DEBUG) {
-            $this->forceCompile = true;
-        }
-
         // Create instance of Language class
         $this->language = Language::getInstance();
     }
@@ -81,6 +65,26 @@ class View
     public function setVar($name, $value)
     {
         $this->variables[$name] = $value;
+    }
+
+    /**
+     * Add css file to template
+     *
+     * @param string $href css file
+     */
+    public function addCss($href)
+    {
+        $this->variables['cssFiles'][] = ['href' => $href];
+    }
+
+    /**
+     * Add script file to template
+     *
+     * @param string $src js file
+     */
+    public function addScript($src)
+    {
+        $this->variables['jsFiles'][] = ['src' => $src];
     }
 
     /**
@@ -135,7 +139,7 @@ class View
             return false;
         }
         $templateLastModified = filemtime($templateFilename);
-        $compileFilename = APP_DIR . "/{$this->compileDir}/tpl_";
+        $compileFilename = COMPILE_DIR . "/tpl_";
         $compileFilename .= str_replace('/', '_ds_', $template);
         $compileFilename .= "_{$templateLastModified}";
         if ($layout) {
@@ -155,7 +159,7 @@ class View
      */
     public function clearCompiledTemplates($template = NULL)
     {
-        $compiledTplPattern = APP_DIR . "/{$this->compileDir}/tpl_";
+        $compiledTplPattern = COMPILE_DIR . "/tpl_";
         if ($template) {
             $compiledTplPattern .= str_replace('/', '_ds_', $template);
         }
@@ -179,7 +183,7 @@ class View
         $compileFilename = $this->getCompileFilename($template, $layout);
 
         // Remove compile file if forceCompile == true
-        if ($this->forceCompile) {
+        if (RenderPage::$forceCompile) {
             if (file_exists($compileFilename)) {
                 unlink($compileFilename);
             }
@@ -187,7 +191,7 @@ class View
 
         // [Compile]
         if (!file_exists($compileFilename)) {
-            include_once RENDERPAGE_DIR . '/compiler/Compiler.php';
+            include_once RENDERPAGE_DIR . '/Compiler.php';
             (new Compiler)->compile($this, $template, $layout);
         }
 

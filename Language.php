@@ -11,8 +11,6 @@
 
 namespace renderpage\libs;
 
-require_once 'traits/Singleton.php';
-
 /**
  * This is Language class
  */
@@ -35,26 +33,30 @@ class Language
      *
      * @var array
      */
-    private $strings;
+    public $strings = [];
 
     /**
-     * Load XML file
-     *
-     * @param string $category
+     * Load XML files
      */
-    private function loadFile($category)
+    public function loadFiles()
     {
-        $filename = APP_DIR . "/languages/{$this->code}/{$category}.xml";
-        if (file_exists($filename)) {
-            $xml = simplexml_load_file($filename);
+        // Get compile filename
+        $compileFilename = COMPILE_DIR . "/xml_languages.php";
 
-            foreach ($xml->children() as $child) {
-                $attributes = $child->attributes();
-                $this->strings[$this->code][$category][(string)$attributes->name] = $child[0];
+        // Remove compile file if forceCompile == true
+        if (RenderPage::$forceCompile) {
+            if (file_exists($compileFilename)) {
+                unlink($compileFilename);
             }
-        } else {
-            $this->strings[$this->code][$category] = [];
         }
+
+        // [Compile]
+        if (!file_exists($compileFilename)) {
+            include_once RENDERPAGE_DIR . '/Compiler.php';
+            (new Compiler)->compileLanguages($compileFilename);
+        }
+
+        $this->strings = require_once $compileFilename;
     }
 
     /**
@@ -77,8 +79,8 @@ class Language
      */
     public function _($category, $str)
     {
-        if (empty($this->strings[$this->code][$category])) {
-            $this->loadFile($category);
+        if (empty($this->strings)) {
+            $this->loadFiles();
         }
 
         if (!empty($this->strings[$this->code][$category][$str])) {
