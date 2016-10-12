@@ -26,19 +26,19 @@ class DB
      *
      * @var object
      */
-    public $dbh;
+    private $dbh;
 
     /**
      * Is connected
      *
      * @var boolean
      */
-    public $isConnected = false;
+    private $isConnected = false;
 
     /**
      * Connect to DB
      */
-    public function connect()
+    private function connect()
     {
         $conf = require_once APP_DIR . '/conf/db.php';
 
@@ -51,6 +51,26 @@ class DB
     }
 
     /**
+     * Executes an SQL statement
+     *
+     * @param string $sql
+     * @param array $inputParameters
+     *
+     * @return object returning a result set as a PDOStatement object
+     */
+    public function query($sql, $inputParameters = [])
+    {
+        if (!$this->isConnected) {
+            $this->connect();
+        }
+
+        $sth = $this->dbh->prepare($sql);
+        $sth->execute($inputParameters);
+
+        return $sth;
+    }
+
+    /**
      * Get array
      *
      * @param string $sql
@@ -60,12 +80,7 @@ class DB
      */
     public function getArray($sql, $inputParameters = [])
     {
-        if (!$this->isConnected) {
-            $this->connect();
-        }
-
-        $sth = $this->dbh->prepare($sql);
-        $sth->execute($inputParameters);
+        $sth = $this->query($sql, $inputParameters);
 
         $result = $sth->fetchAll();
 
@@ -82,12 +97,7 @@ class DB
      */
     public function getRow($sql, $inputParameters = [])
     {
-        if (!$this->isConnected) {
-            $this->connect();
-        }
-
-        $sth = $this->dbh->prepare($sql);
-        $sth->execute($inputParameters);
+        $sth = $this->query($sql, $inputParameters);
 
         $result = $sth->fetch();
 
@@ -123,18 +133,13 @@ class DB
      */
     public function insert($into, $data)
     {
-        if (!$this->isConnected) {
-            $this->connect();
-        }
-
         $into = str_replace('.', '`.`', $into);
         $fields = implode('`, `', array_keys($data));
         $values = implode(', ', array_fill(0, count($data), '?'));
 
         $sql = "INSERT INTO `{$into}` (`{$fields}`) VALUES ({$values});";
 
-        $sth = $this->dbh->prepare($sql);
-        $sth->execute(array_values($data));
+        $this->query($sql, array_values($data));
 
         return $this->dbh->lastInsertId();
     }
@@ -146,9 +151,10 @@ class DB
      */
     public function truncate($table)
     {
+        $table = str_replace('.', '`.`', $table);
+
         $sql = "TRUNCATE TABLE `{$table}`";
 
-        $sth = $this->dbh->prepare($sql);
-        $sth->execute();
+        $this->query($sql);
     }
 }
