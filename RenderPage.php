@@ -46,6 +46,7 @@ require_once RENDERPAGE_DIR . '/traits/Singleton.php';
 require_once RENDERPAGE_DIR . '/RenderPageAutoloader.php';
 require_once RENDERPAGE_DIR . '/RenderPageException.php';
 require_once RENDERPAGE_DIR . '/Route.php';
+require_once RENDERPAGE_DIR . '/Session.php';
 require_once RENDERPAGE_DIR . '/Language.php';
 require_once RENDERPAGE_DIR . '/DB.php';
 require_once RENDERPAGE_DIR . '/Model.php';

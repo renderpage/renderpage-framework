@@ -73,6 +73,28 @@ class DB
     }
 
     /**
+     * Get row
+     *
+     * @param string $sql
+     * @param array $inputParameters
+     *
+     * @return array
+     */
+    public function getRow($sql, $inputParameters = [])
+    {
+        if (!$this->isConnected) {
+            $this->connect();
+        }
+
+        $sth = $this->dbh->prepare($sql);
+        $sth->execute($inputParameters);
+
+        $result = $sth->fetch();
+
+        return $result;
+    }
+
+    /**
      * Insert
      *
      * @param string $into table name

@@ -62,15 +62,12 @@ class RenderPageException extends Exception
      */
     public static function exceptionHandler(Exception $e)
     {
-        $view = new View;
+        $errstr = self::$errstr;
+        $errfile = self::$errfile;
+        $errline = self::$errline;
+        $e = $e;
 
-        $view->setVar('title', 'Exception');
-        $view->setVar('errstr', self::$errstr);
-        $view->setVar('errfile', self::$errfile);
-        $view->setVar('errline', self::$errline);
-        $view->setVar('e', $e);
-
-        echo $view->render('exception', 'error');
+        include __DIR__ . '/templates/exception.php';
     }
 
     /**

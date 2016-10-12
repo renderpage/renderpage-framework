@@ -54,4 +54,18 @@ class Controller
     {
         return $this->view->language->_($category, $str);
     }
+
+    /**
+     * Redirect
+     *
+     * @param string $location
+     * @param string $code
+     *
+     * @return void
+     */
+    public function redirect($location, $httpResponseCode = 302)
+    {
+        header("Location: {$location}", true, $httpResponseCode);
+        exit();
+    }
 }

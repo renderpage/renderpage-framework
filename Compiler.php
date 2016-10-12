@@ -31,25 +31,25 @@ class Compiler
     public $rightDelimiter = '}';
 
     /**
-     * Replace instructions
+     * Tpl files
      *
      * @var array
      */
-    private $replaceInstructions = [];
+    public $files = [];
 
     /**
-     * Template contents
+     * Instructions
      *
-     * @var string
+     * @var array
      */
-    private $templateData = '';
+    public $instructions = [];
 
     /**
-     * Compile contents
+     * Class instance
      *
-     * @var string
+     * @var array
      */
-    private $compileData = '';
+    public $classInst = [];
 
     /**
      * Init
@@ -57,25 +57,6 @@ class Compiler
     public function __construct()
     {
         // none
-    }
-
-    /**
-     * Add new replace instruction
-     *
-     * @param string $pattern pattern for replace
-     * @param string $callback function for replace
-     */
-    public function addReplaceInstruction($pattern, $callback)
-    {
-        $this->replaceInstructions[$pattern] = $callback;
-    }
-
-    /**
-     * Code optimization
-     */
-    public function optimization()
-    {
-        $this->compileData = str_replace('?><?php ', '', $this->compileData);
     }
 
     /**
@@ -95,37 +76,202 @@ class Compiler
         if (is_writable($dir)) {
             return file_put_contents($filename, $data, LOCK_EX);
         } else {
-            die("{$filename} is not writable");
+            throw new RenderPageException(0, "Write error: {$dir} is not writable", __FILE__, __LINE__);
         }
 
         return 0;
     }
 
     /**
-     * Compile Block
+     * Compile variable
      *
-     * @param object $view instance of View class
-     * @param string $block
+     * @param array $name
      *
      * @return string
      */
-    public function compileBlock($view, $block)
+    public function getVariable($name)
     {
-        // Load needed external files
-        foreach (glob(RENDERPAGE_DIR . '/compiler/tpl/*.php') as $filename) {
-            include_once $filename;
+        $name = str_replace(['$', '.'], ['', "']['"], $name);
+        return "\$this->variables['{$name}']";
+    }
+
+    /**
+     * Parse expr
+     *
+     * @param string $expr
+     *
+     * @return array
+     */
+    public function parseExpr($expr)
+    {
+        $aExpr = array_diff(preg_split("/ |\t|\n/", $expr), ['']);
+        $result['name'] = array_shift($aExpr);
+        $result['params'] = $aExpr;
+
+        // workarea
+        if ($result['name'] == 'workarea') {
+            $result['inc'] = $this->parse($this->files['template']['filename']);
         }
 
-        // Run replace
-        foreach ($this->replaceInstructions as $pattern => $callback) {
-            $block = preg_replace_callback(
-                "/(\t+| +|){$this->leftDelimiter}(\t+| +|){$pattern}{$this->rightDelimiter}/si",
-                $callback,
-                $block
-            );
+        // echo
+        if ($result['name'][0] == '$') {
+            $result['params'] = [$result['name']];
+            $result['name'] = 'echo';
         }
 
-        return $block;
+        // language
+        if ($result['name'][0] == '"') {
+            $result['params'] = explode('.', trim($result['name'], '"'));
+            $result['name'] = 'language';
+        }
+
+        return $result;
+    }
+
+    /**
+     * Parse tree 
+     *
+     * @param array $parseTree
+     *
+     * @return array
+     */
+    public function parseTree($parseTree)
+    {
+        /*$result = [];
+        $openTag = 0;
+        $closeTag = 0;
+        $nParseTree = count($parseTree);
+
+        for ($i = 0; $i < $nParseTree; $i++) {
+
+            if ($parseTree[$i]['type'] == 'expr') {
+                if ($parseTree[$i]['expr']['name'] == 'foreach') {
+                    $openTag = $i;
+                }
+
+                if ($parseTree[$i]['expr']['name'] == '/foreach') {
+                    $closeTag = $i;
+                    $inc = array_slice($parseTree, $openTag + 1, $closeTag - $nParseTree);
+                    $parseTree[$openTag]['expr']['inc'] = $inc;
+
+                    // Remove
+                    for ($j = $openTag + 1; $j < $closeTag; $j++) {
+                        $parseTree[$j]['type'] = 'rm';                        
+                    }
+                }
+            }
+
+        }*/
+
+        $result = $parseTree;
+
+        return $result;
+    }
+
+    /**
+     * Parse
+     *
+     * @param string $filename file name
+     *
+     * @return array
+     */
+    public function parse($filename)
+    {
+        $result = [];
+        $buffer = '';
+
+        $fp = fopen($filename, 'r');
+        while (false !== ($char = fgetc($fp))) {
+            switch ($char) {
+            case $this->leftDelimiter:
+                $result[] = [
+                    'type' => 'raw',
+                    'data' => $buffer
+                ];
+                $buffer = '';
+                break;
+            case $this->rightDelimiter:
+                $result[] = [
+                    'type' => 'expr',
+                    'expr' => $this->parseExpr($buffer)
+                ];
+                $buffer = '';
+                break;
+            default:
+                $buffer .= $char;
+            }
+        }
+        fclose($fp);
+
+        if ($buffer != '') {
+            $result[] = [
+                'type' => 'raw',
+                'data' => $buffer
+            ];
+        }
+
+        $result = $this->parseTree($result);
+
+        return $result;
+    }
+
+    /**
+     * Code generation
+     *
+     * @param array $parseTree
+     *
+     * @return string
+     */
+    public function codeGeneration($parseTree)
+    {
+        $result = '';
+        $before = '';
+
+        foreach ($parseTree as $foo) {
+            switch ($foo['type']) {
+            case 'raw':
+                $result .= $foo['data'];
+                $before .= $foo['data'];
+                break;
+            case 'expr':
+                if (!empty($this->instructions[$foo['expr']['name']])) {
+                    $className = $this->instructions[$foo['expr']['name']]['className'];
+                    $method = $this->instructions[$foo['expr']['name']]['method'];
+
+                    $result .= $this->classInst[$className]->$method($foo['expr']['params']);
+                }
+
+                if (!empty($foo['expr']['inc'])) {
+                    // Recursion
+                    $buffer = $this->codeGeneration($foo['expr']['inc']);
+
+                    // workarea
+                    if ($foo['expr']['name'] == 'workarea') {
+                        // Indent
+                        if (preg_match('/(?<whitespace>[ ]+)$/', $before, $matches)) {
+                            $buffer = ltrim(preg_replace('!^!m', $matches['whitespace'], trim($buffer)));
+                        }
+                    }
+
+                    $result .= $buffer;
+                }
+                break;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Code optimization
+     * @param string $data
+     *
+     * @return string
+     */
+    public function optimization($data)
+    {
+        $data = str_replace('?><?php ', '', $data);
+        return $data;
     }
 
     /**
@@ -139,56 +285,57 @@ class Compiler
      */
     public function compile($view, $template, $layout)
     {
+        // Load needed external files
+        foreach (glob(RENDERPAGE_DIR . '/compiler/Compiler*.php') as $filename) {
+            include_once $filename;
+
+            // Init class
+            $className = '\\renderpage\\libs\\compiler\\' . basename($filename, '.php');
+            $this->classInst[$className] = new $className;
+            $this->classInst[$className]->compiler = $this;
+        }
+
+        // Load instructions
+        $this->instructions = require_once RENDERPAGE_DIR . '/compiler/instructions.php';
+
         // Remove old compile files
         $view->clearCompiledTemplates($template);
 
-        // Get template contents
-        $templateFilename = $view->getTemplateFilename($template);
-        if (!file_exists($templateFilename)) {
-            throw new RenderPageException(0, "{$template} is not exists");
-            return 0;
-        }
-
-        $this->templateData = file_get_contents($templateFilename);
+        $this->files['template'] = [
+            'filename' => $view->getTemplateFilename($template)
+        ];
 
         if ($layout) {
-            // Get layout contents
-            $layoutFilename = $view->getLayoutFilename($layout);
-            if (!file_exists($layoutFilename)) {
-                throw new RenderPageException(0, "{$layout} is not exists");
-                return 0;
-            }
-            $layoutData = file_get_contents($layoutFilename);
-
-            // workarea
-            $this->compileData = preg_replace_callback(
-                "/(\t+| +|){$this->leftDelimiter}workarea{$this->rightDelimiter}/i",
-                function ($matches) {
-                    return rtrim(preg_replace('!^!m', $matches[1], $this->templateData));
-                },
-                $layoutData
-            );
+            $this->files['layout'] = [
+                'filename' => $view->getLayoutFilename($layout)
+            ];
+            $parseFilename = $this->files['layout']['filename'];
         } else {
-            $this->compileData = $this->templateData;
+            $parseFilename = $this->files['template']['filename'];
         }
 
-        $this->compileData = $this->compileBlock($view, $this->compileData);
+        // Parse
+        $parseTree = $this->parse($parseFilename);
+
+        // Code generation
+        $data = $this->codeGeneration($parseTree);
 
         // Add version
-        $this->compileData = '<?php $rpVersion = "' .
+        $data = '<?php $rpVersion = "' .
                        RenderPage::RENDERPAGE_VERSION .
-                       '"; ?>' . $this->compileData;
+                       '"; ?>' . $data;
 
         // Add compile comment
-        $this->compileData = '<?php /* RenderPage version: ' .
+        $data = '<?php /* RenderPage version: ' .
                        RenderPage::RENDERPAGE_VERSION . ', ' .
                        'created on ' . date('c') .
-                       ' */ ?>' . $this->compileData;
+                       ' */ ?>' . $data;
 
-        $this->optimization();
+        // Code optimization
+        $data = $this->optimization($data);
 
         // Write compile file
-        return $this->writeFile($view->getCompileFilename($template, $layout), $this->compileData);
+        return $this->writeFile($view->getCompileFilename($template, $layout), $data);
     }
 
     /**
