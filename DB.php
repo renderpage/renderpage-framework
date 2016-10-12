@@ -95,6 +95,25 @@ class DB
     }
 
     /**
+     * Get one
+     *
+     * @param string $sql
+     * @param array $inputParameters
+     *
+     * @return mixed
+     */
+    public function getOne($sql, $inputParameters = [])
+    {
+        $row = $this->getRow($sql, $inputParameters);
+
+        if (!$row) {
+            return false;
+        }
+
+        return $row[0];
+    }
+
+    /**
      * Insert
      *
      * @param string $into table name
