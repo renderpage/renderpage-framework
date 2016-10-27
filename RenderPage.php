@@ -45,6 +45,7 @@ if (!defined('COMPILE_DIR')) {
 require_once RENDERPAGE_DIR . '/traits/Singleton.php';
 require_once RENDERPAGE_DIR . '/RenderPageAutoloader.php';
 require_once RENDERPAGE_DIR . '/RenderPageException.php';
+require_once RENDERPAGE_DIR . '/Request.php';
 require_once RENDERPAGE_DIR . '/Route.php';
 require_once RENDERPAGE_DIR . '/Session.php';
 require_once RENDERPAGE_DIR . '/Language.php';
@@ -93,14 +94,14 @@ class RenderPage
      *
      * @var object
      */
-    public $route;
+    private $route;
 
     /**
      * Instance of active controller
      *
      * @var object
      */
-    public $controller;
+    private $controller;
 
     /**
      * Output
@@ -149,13 +150,14 @@ class RenderPage
     public function execute()
     {
         if (!empty($this->controller)) {
-            // Prepare controller
-            if (method_exists($this->controller, 'prepare')) {
-                $this->controller->prepare();
-            }
+            // Before action
+            $this->controller->before();
 
             // Action run
             $this->outputData = $this->controller->{$this->route->actionName}($this->route->params);
+
+            // After action
+            $this->controller->after();
         }
     }
 
@@ -165,7 +167,7 @@ class RenderPage
     public function output()
     {
         if ($this->outputData === false) {
-            header("{$_SERVER['SERVER_PROTOCOL']} 404 Not Found");
+            header('Content-Type: text/html; charset=utf-8', true, 404);
             $view = new View;
             $view->setVar('title', '404');
             echo $view->render('404', 'error');

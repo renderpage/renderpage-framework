@@ -19,27 +19,6 @@ use Exception;
 class RenderPageException extends Exception
 {
     /**
-     * Error message
-     *
-     * @var string
-     */
-    public static $errstr;
-
-    /**
-     * Error file name
-     *
-     * @var string
-     */
-    public static $errfile;
-
-    /**
-     * Error line
-     *
-     * @var int
-     */
-    public static $errline;
-
-    /**
      * Init
      *
      * @param int $errno
@@ -50,9 +29,7 @@ class RenderPageException extends Exception
      */
     public function __construct($errno, $errstr, $errfile = '', $errline = 0, $errcontext = [])
     {
-        self::$errstr = $errstr;
-        self::$errfile = $errfile;
-        self::$errline = $errline;
+        parent::__construct($errstr, $errno);
     }
 
     /**
@@ -62,11 +39,10 @@ class RenderPageException extends Exception
      */
     public static function exceptionHandler(Exception $e)
     {
-        $errstr = self::$errstr;
-        $errfile = self::$errfile;
-        $errline = self::$errline;
-        $e = $e;
-
+        // 500 Internal Server Error
+        header('Content-Type: text/html; charset=utf-8', true, 500);
+        $trace = $e->getTrace();
+        $source = self::source($trace[0]['file'], $trace[0]['line']);
         include __DIR__ . '/templates/exception.php';
     }
 
@@ -82,6 +58,36 @@ class RenderPageException extends Exception
     public static function errorHandler($errno, $errstr, $errfile = '', $errline = 0, $errcontext = [])
     {
         throw new RenderPageException($errno, $errstr, $errfile, $errline, $errcontext);
-        return true;
+    }
+
+    /**
+     * Highlight source code, and select line by number
+     *
+     * @param string  $file
+     * @param integer $line
+     *
+     * @return string
+     */
+    public static function source($file, $line)
+    {
+        $tokens = token_get_all(file_get_contents($file));
+
+        //$source = "<div class=line><span class=number>1</span>";
+        $source = '';
+        //$lines = [];
+
+        foreach ($tokens as $token) {
+            if (is_array($token)) {            
+                $source .= '<span class="' . strtolower(token_name($token[0])) . '">';
+                $source .= htmlspecialchars($token[1], ENT_NOQUOTES);
+                $source .= '</span>';
+            } else {
+                $source .= $token;
+            }
+        }
+
+        //$source .= '</div>';
+
+        return $source;
     }
 }

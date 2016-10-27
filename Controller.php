@@ -17,24 +17,34 @@ namespace renderpage\libs;
 class Controller
 {
     /**
+     * Instance of Request class
+     *
+     * @var object
+     */
+    protected $request;
+
+    /**
      * Instance of Language class
      *
      * @var object
      */
-    public $language;
+    protected $language;
 
     /**
      * Instance of View class
      *
      * @var object
      */
-    public $view;
+    protected $view;
 
     /**
      * Init
      */
     public function __construct()
     {
+        // Create instance of Request class
+        $this->request = Request::getInstance();
+
         // Create instance of Language class
         $this->language = Language::getInstance();
 
@@ -43,7 +53,23 @@ class Controller
     }
 
     /**
-     * Allias for $this->view->language->_($category, $str)
+     * Before action
+     */
+    public function before()
+    {
+        // none
+    }
+
+    /**
+     * After action
+     */
+    public function after()
+    {
+        // none
+    }
+
+    /**
+     * Allias for $this->language->_($category, $str)
      *
      * @param string $category
      * @param string $str
@@ -52,7 +78,7 @@ class Controller
      */
     public function _($category, $str)
     {
-        return $this->view->language->_($category, $str);
+        return $this->language->_($category, $str);
     }
 
     /**
@@ -61,11 +87,11 @@ class Controller
      * @param string $location
      * @param string $code
      *
-     * @return void
+     * @return string
      */
     public function redirect($location, $httpResponseCode = 302)
     {
         header("Location: {$location}", true, $httpResponseCode);
-        exit();
+        return '';
     }
 }

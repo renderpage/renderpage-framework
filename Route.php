@@ -85,24 +85,7 @@ class Route
     public function __construct()
     {
         // Get url path
-        $this->urlPath = $this->getUrlPath();
-    }
-
-    /**
-     * Get url path
-     *
-     * @return string
-     */
-    public function getUrlPath()
-    {
-        // Remove query
-        $urlPath = explode('?', $_SERVER['REQUEST_URI']);
-        $urlPath = array_shift($urlPath);
-
-        // Remove duplicate slashes
-        $urlPath = '/' . implode('/', array_diff(explode('/', $urlPath), ['']));
-
-        return urldecode($urlPath);
+        $this->urlPath = Request::getInstance()->getUrlPath();
     }
 
     /**
@@ -123,7 +106,7 @@ class Route
      *
      * @return string
      */
-    public function getControllerName($str)
+    private function getControllerName($str)
     {
         return str_replace(' ' , '', ucwords(str_replace('-' , ' ', $str))) . 'Controller';
     }
@@ -135,7 +118,7 @@ class Route
      *
      * @return string
      */
-    public function getControllerFilename($controllerName)
+    private function getControllerFilename($controllerName)
     {
         return APP_DIR . "/{$this->controllerDir}/{$controllerName}.php";
     }
@@ -147,7 +130,7 @@ class Route
      *
      * @return string
      */
-    public function getActionName($str)
+    private function getActionName($str)
     {
         return 'action' . str_replace(' ' , '', ucwords(str_replace('-' , ' ', $str)));
     }

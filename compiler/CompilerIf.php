@@ -33,7 +33,10 @@ class CompilerIf
     public function openTag($params)
     {
         $varName = $this->compiler->getVariable($params[0]);
-        return "<?php if (!empty({$varName}) && {$varName}) { ?>";;
+        if (!empty($params[1])) {
+            return "<?php if (!empty({$varName}) && ({$varName} {$params[1]} {$params[2]})) { ?>";
+        }
+        return "<?php if (!empty({$varName}) && {$varName}) { ?>";
     }
 
     /**
