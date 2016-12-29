@@ -78,79 +78,47 @@ class RenderPageException extends ErrorException
     }
 
     /**
-     * Highlight source code, and select line by number
+     * Source code, and select line by number
      *
-     * @param string  $file
+     * @param string  $filename
      * @param integer $line
      *
-     * @return string
+     * @return string|boolean
      */
-    public static function source($file, $line_number, $padding = 5)
+    public static function source($filename, $lineNumber, $padding = 5)
     {
-		if (!$file OR !is_readable($file)) {
-			// Continuing will cause errors
-			return FALSE;
-		}
+        if (!is_readable($filename)) {
+            return false;
+        }
 
-		// Open the file and set the line position
-		$file = fopen($file, 'r');
-		$line = 0;
+        $fileHandle = fopen($filename, 'r');
+        $line = 0;
+        $range = ['start' => $lineNumber - $padding, 'end' => $lineNumber + $padding];
+        $format = '% '.strlen($range['end']).'d';
+        $source = '';
 
-		// Set the reading range
-		$range = ['start' => $line_number - $padding, 'end' => $line_number + $padding];
-
-		// Set the zero-padding amount for line numbers
-		$format = '% '.strlen($range['end']).'d';
-
-		$source = '';
-		while (($row = fgets($file)) !== false) {
-			// Increment the line number
-			if (++$line > $range['end']) {
-				break;
+        while (($row = fgets($fileHandle)) !== false) {
+            if (++$line > $range['end']) {
+                break;
             }
 
-			if ($line >= $range['start']) {
-				// Make the row safe for output
-				$row = htmlspecialchars($row, ENT_NOQUOTES, RenderPage::$charset);
+            if ($line >= $range['start']) {
+                $row = htmlspecialchars($row, ENT_NOQUOTES, RenderPage::$charset);
 
-				// Trim whitespace and sanitize the row
-				$row = '<span class="number">' . sprintf($format, $line) . '</span> '.$row;
+                $row = '<span class="number">' . sprintf($format, $line) . '</span> '.$row;
 
-				if ($line === $line_number) {
-					// Apply highlighting to this row
-					$row = '<span class="line highlight">'.$row.'</span>';
-				} else {
-					$row = '<span class="line">'.$row.'</span>';
-				}
+                if ($line === $lineNumber) {
+                    $row = '<span class="line highlight">'.$row.'</span>';
+                } else {
+                    $row = '<span class="line">'.$row.'</span>';
+                }
 
-				// Add to the captured source
-				$source .= $row;
-			}
-		}
-
-		// Close the file
-		fclose($file);
-
-		return $source;
-        /*
-        $tokens = token_get_all(file_get_contents($file));
-
-        //$source = "<div class=line><span class=number>1</span>";
-        $source = '';
-        //$lines = [];
-
-        foreach ($tokens as $token) {
-            if (is_array($token)) {            
-                $source .= '<span class="' . strtolower(token_name($token[0])) . '">';
-                $source .= htmlspecialchars($token[1], ENT_NOQUOTES);
-                $source .= '</span>';
-            } else {
-                $source .= $token;
+                $source .= $row;
             }
         }
 
-        //$source .= '</div>';
+        fclose($fileHandle);
 
-        return $source;*/
+        return $source;
     }
 }

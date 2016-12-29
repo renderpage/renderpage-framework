@@ -25,8 +25,6 @@
       .source .number {
         background: #0c0c0c;
         color: #8a8a8a;
-      }
-      .source .number {
         padding: 0 16px;
       }
       .source .highlight {
@@ -39,8 +37,6 @@
       }
       .stack-trace .function {
         color: #fff;
-        /*color: #dfc47d;
-        font-weight: bold;*/
       }
     </style>
   </head>
