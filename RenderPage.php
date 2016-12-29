@@ -83,6 +83,13 @@ class RenderPage
     public static $forceCompile = false;
 
     /**
+     * Charset
+     *
+     * @var string
+     */
+    public static $charset = 'utf-8';
+
+    /**
      * Instance of Language class
      *
      * @var object

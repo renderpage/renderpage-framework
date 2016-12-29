@@ -40,7 +40,7 @@ class Session
      *
      * @return mixed
      */
-    public function get($name)
+    public function get(string $name)
     {
         $this->start();
 
@@ -59,7 +59,7 @@ class Session
      *
      * @return void
      */
-    public function set($name, $value)
+    public function set(string $name, $value)
     {
         $this->start();
 
@@ -73,7 +73,7 @@ class Session
      *
      * @return void
      */
-    public function del($name)
+    public function del(string $name)
     {
         $this->start();
 

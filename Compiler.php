@@ -63,10 +63,11 @@ class Compiler
      * Write compile file
      *
      * @param string $filename pattern for replace
+     * @param string $data
      *
      * @return int
      */
-    public function writeFile($filename, $data)
+    public function writeFile(string $filename, string $data)
     {
         $dir = dirname($filename);
         if (!is_dir($dir)) {
@@ -85,11 +86,11 @@ class Compiler
     /**
      * Compile variable
      *
-     * @param array $name
+     * @param string $name
      *
      * @return string
      */
-    public function getVariable($name)
+    public function getVariable(string $name)
     {
         $name = str_replace(['$', '.'], ['', "']['"], $name);
         return "\$this->variables['{$name}']";
@@ -102,7 +103,7 @@ class Compiler
      *
      * @return array
      */
-    public function parseExpr($expr)
+    public function parseExpr(string $expr)
     {
         $aExpr = array_diff(preg_split("/ |\t|\n/", $expr), ['']);
         $result['name'] = array_shift($aExpr);
@@ -135,7 +136,7 @@ class Compiler
      *
      * @return array
      */
-    public function parseTree($parseTree)
+    public function parseTree(array $parseTree)
     {
         /*$result = [];
         $openTag = 0;
@@ -175,7 +176,7 @@ class Compiler
      *
      * @return array
      */
-    public function parse($filename)
+    public function parse(string $filename)
     {
         $result = [];
         $buffer = '';
@@ -222,7 +223,7 @@ class Compiler
      *
      * @return string
      */
-    public function codeGeneration($parseTree)
+    public function codeGeneration(array $parseTree)
     {
         $result = '';
         $before = '';
@@ -268,9 +269,13 @@ class Compiler
      *
      * @return string
      */
-    public function optimization($data)
+    public function optimization(string $data)
     {
         $data = str_replace('?><?php ', '', $data);
+
+        // Strip
+        //$data = preg_replace('!\s+!u', ' ', $data);
+
         return $data;
     }
 
@@ -283,7 +288,7 @@ class Compiler
      *
      * @return int
      */
-    public function compile($view, $template, $layout)
+    public function compile($view, string $template, $layout): int
     {
         // Load needed external files
         foreach (glob(RENDERPAGE_DIR . '/compiler/Compiler*.php') as $filename) {
@@ -340,8 +345,10 @@ class Compiler
 
     /**
      * Compile languages
+     *
+     * @param string $compileFilename
      */
-    public function compileLanguages($compileFilename)
+    public function compileLanguages(string $compileFilename)
     {
         $strings = [];
 

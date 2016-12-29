@@ -58,7 +58,7 @@ class DB
      *
      * @return object returning a result set as a PDOStatement object
      */
-    public function query($sql, $inputParameters = [])
+    public function query(string $sql, array $inputParameters = [])
     {
         if (!$this->isConnected) {
             $this->connect();
@@ -78,7 +78,7 @@ class DB
      *
      * @return array
      */
-    public function getArray($sql, $inputParameters = [])
+    public function getArray(string $sql, array $inputParameters = [])
     {
         $sth = $this->query($sql, $inputParameters);
 
@@ -95,7 +95,7 @@ class DB
      *
      * @return array
      */
-    public function getRow($sql, $inputParameters = [])
+    public function getRow(string $sql, array $inputParameters = [])
     {
         $sth = $this->query($sql, $inputParameters);
 
@@ -112,7 +112,7 @@ class DB
      *
      * @return mixed
      */
-    public function getOne($sql, $inputParameters = [])
+    public function getOne(string $sql, array $inputParameters = [])
     {
         $row = $this->getRow($sql, $inputParameters);
 
@@ -131,7 +131,7 @@ class DB
      *
      * @return int insert id
      */
-    public function insert($into, $data)
+    public function insert(string $into, array $data): int
     {
         $into = str_replace('.', '`.`', $into);
         $fields = implode('`, `', array_keys($data));
@@ -149,7 +149,7 @@ class DB
      *
      * @param string $table table name
      */
-    public function truncate($table)
+    public function truncate(string $table)
     {
         $table = str_replace('.', '`.`', $table);
 

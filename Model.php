@@ -49,7 +49,7 @@ class Model
      *
      * @return mixed
      */
-    public function __get($name)
+    public function __get(string $name)
     {
         $method = "get{$name}";
         return $this->{$method}();
@@ -61,7 +61,7 @@ class Model
      * @param string $name property name
      * @param mixed $value parameter passed to setter
      */
-    public function __set($name, $value)
+    public function __set(string $name, $value)
     {
         $method = "set{$name}";
         $this->{$method}($value);

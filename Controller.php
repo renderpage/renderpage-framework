@@ -76,7 +76,7 @@ class Controller
      *
      * @return string
      */
-    public function _($category, $str)
+    public function _(string $category, string $str)
     {
         return $this->language->_($category, $str);
     }
@@ -85,11 +85,11 @@ class Controller
      * Redirect
      *
      * @param string $location
-     * @param string $code
+     * @param int $code
      *
      * @return string
      */
-    public function redirect($location, $httpResponseCode = 302)
+    public function redirect(string $location, int $httpResponseCode = 302): string
     {
         header("Location: {$location}", true, $httpResponseCode);
         return '';

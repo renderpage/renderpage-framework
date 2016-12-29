@@ -64,7 +64,7 @@ class Language
      *
      * @param string $code
      */
-    public function setCurrentLanguage($code)
+    public function setCurrentLanguage(string $code)
     {
         $this->code = $code;
     }
@@ -77,7 +77,7 @@ class Language
      *
      * @return string
      */
-    public function _($category, $str)
+    public function _(string $category, string $str): string
     {
         if (empty($this->strings)) {
             $this->loadFiles();
