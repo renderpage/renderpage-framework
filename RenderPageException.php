@@ -59,6 +59,18 @@ class RenderPageException extends ErrorException
         $trace   = $e->getTrace();
         $source  = self::source($file, $line);
 
+        // Write to file
+        $log = "{$message} in {$file} on line {$line}";
+        error_log($log);
+
+        // Send to admin
+        if (file_exists(APP_DIR . '/conf/main.php')) {
+            $conf = require APP_DIR . '/conf/main.php';
+            if (isset($conf['error']['email']) && isset($conf['error']['from'])) {
+                error_log($log, 1, $conf['error']['email'], "Subject: Error\r\nFrom: {$conf['error']['from']}");
+            }
+        }
+
         // Show
         include __DIR__ . '/templates/exception.php';
     }

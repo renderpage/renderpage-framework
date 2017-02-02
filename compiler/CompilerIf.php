@@ -11,7 +11,7 @@
 
 namespace renderpage\libs\compiler;
 
-use renderpage\libs\RenderPageException;
+use renderpage\libs\CompilerException;
 
 /**
  * This is CompilerIf class
@@ -24,6 +24,10 @@ class CompilerIf
      * @var object
      */
     public $compiler;
+
+    public $filename;
+
+    public $line;
 
     private $comparisonOperators = [
         '==',  // Equal
@@ -48,14 +52,14 @@ class CompilerIf
     public function openTag($params)
     {
         if (!empty($params[3])) {
-            throw new RenderPageException('Parse error: syntax error - too many args');
+            throw new CompilerException('Parse error: syntax error - too many args', 0, E_ERROR, $this->filename, $this->line);
         }
 
         $varName = $this->compiler->getVariable($params[0]);
 
         if (!empty($params[1])) {
             if (!in_array($params[1], $this->comparisonOperators)) {
-                throw new RenderPageException('Parse error: syntax error - invalid comparison operator', 0, E_ERROR); //'/home/u452794/dev.renderpage.org/app/templates/tools/ru2en.tpl', 2);
+                throw new CompilerException('Parse error: syntax error - invalid comparison operator', 0, E_ERROR, $this->filename, $this->line);
             }
             return "<?php if (!empty({$varName}) && ({$varName} {$params[1]} {$params[2]})) { ?>";
         }

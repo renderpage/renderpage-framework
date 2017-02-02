@@ -182,19 +182,27 @@ class Compiler
         $buffer = '';
 
         $fp = fopen($filename, 'r');
+        $line = 1;
         while (false !== ($char = fgetc($fp))) {
+            if ($char == "\n") {
+                ++$line;
+            }
             switch ($char) {
             case $this->leftDelimiter:
                 $result[] = [
-                    'type' => 'raw',
-                    'data' => $buffer
+                    'filename' => $filename,
+                    'line'     => $line,
+                    'type'     => 'raw',
+                    'data'     => $buffer
                 ];
                 $buffer = '';
                 break;
             case $this->rightDelimiter:
                 $result[] = [
-                    'type' => 'expr',
-                    'expr' => $this->parseExpr($buffer)
+                    'filename' => $filename,
+                    'line'     => $line,
+                    'type'     => 'expr',
+                    'expr'     => $this->parseExpr($buffer)
                 ];
                 $buffer = '';
                 break;
@@ -206,8 +214,10 @@ class Compiler
 
         if ($buffer != '') {
             $result[] = [
-                'type' => 'raw',
-                'data' => $buffer
+                'filename' => $filename,
+                'line'     => $line,
+                'type'     => 'raw',
+                'data'     => $buffer
             ];
         }
 
@@ -238,6 +248,9 @@ class Compiler
                 if (!empty($this->instructions[$foo['expr']['name']])) {
                     $className = $this->instructions[$foo['expr']['name']]['className'];
                     $method = $this->instructions[$foo['expr']['name']]['method'];
+
+                    $this->classInst[$className]->filename = $foo['filename'];
+                    $this->classInst[$className]->line = $foo['line'];
 
                     $result .= $this->classInst[$className]->$method($foo['expr']['params']);
                 }
