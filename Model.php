@@ -66,4 +66,17 @@ class Model
         $method = "set{$name}";
         $this->{$method}($value);
     }
+
+    /**
+     * Allias for $this->language->_($category, $str)
+     *
+     * @param string $category
+     * @param string $str
+     *
+     * @return string
+     */
+    public function _(string $category, string $str)
+    {
+        return $this->language->_($category, $str);
+    }
 }
