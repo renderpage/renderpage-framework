@@ -61,7 +61,7 @@ class CompilerIf
             if (!in_array($params[1], $this->comparisonOperators)) {
                 throw new CompilerException('Parse error: syntax error - invalid comparison operator', 0, E_ERROR, $this->filename, $this->line);
             }
-            return "<?php if (!empty({$varName}) && ({$varName} {$params[1]} {$params[2]})) { ?>";
+            return "<?php if (isset({$varName}) && ({$varName} {$params[1]} {$params[2]})) { ?>";
         }
 
         return "<?php if (!empty({$varName}) && {$varName}) { ?>";
