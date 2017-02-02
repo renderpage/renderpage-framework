@@ -22,11 +22,28 @@ class Session
     use traits\Singleton;
 
     /**
+     * Session name
+     */
+    const DEFAULT_SESSION_NAME = 'SESSID';
+
+    /**
      * Init
      */
     public function start()
     {
-        session_name('SESSID');
+        if (file_exists(APP_DIR . '/conf/session.php')) {
+            $conf = require APP_DIR . '/conf/session.php';
+            if (isset($conf['name'])) {
+                session_name($conf['name']);
+            } else {
+                session_name(self::DEFAULT_SESSION_NAME);
+            }
+            if (isset($conf['domain'])) {
+                session_set_cookie_params(0, '/', $conf['domain']);
+            }
+        } else {
+            session_name(self::DEFAULT_SESSION_NAME);
+        }
 
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
