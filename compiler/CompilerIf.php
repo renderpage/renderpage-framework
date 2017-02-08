@@ -55,6 +55,11 @@ class CompilerIf
             throw new CompilerException('Parse error: syntax error - too many args', 0, E_ERROR, $this->filename, $this->line);
         }
 
+        if (substr($params[0], 0, 1) === '!') {
+            $varName = $this->compiler->getVariable(substr($params[0], 1));
+            return "<?php if (empty({$varName}) || !{$varName}) { ?>";
+        }
+
         $varName = $this->compiler->getVariable($params[0]);
 
         if (!empty($params[1])) {
