@@ -38,6 +38,13 @@ class Controller
     protected $view;
 
     /**
+     * Last-Modified
+     *
+     * @var int Unix timestamp
+     */
+    public $lastModified = 0;
+
+    /**
      * Init
      */
     public function __construct()
