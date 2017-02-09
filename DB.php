@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Project: RenderPage
  * File:    DB.php
@@ -14,8 +15,8 @@ namespace renderpage\libs;
 /**
  * This is DB class
  */
-class DB
-{
+class DB {
+
     /**
      * Singleton trait
      */
@@ -38,9 +39,8 @@ class DB
     /**
      * Connect to DB
      */
-    private function connect()
-    {
-        $conf = require_once APP_DIR . '/conf/db.php';
+    private function connect() {
+        $conf = require APP_DIR . '/conf/db.php';
 
         try {
             $this->dbh = new \PDO($conf['dsn'], $conf['username'], $conf['password'], [\PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES {$conf['charset']}"]);
@@ -58,8 +58,7 @@ class DB
      *
      * @return object returning a result set as a PDOStatement object
      */
-    public function query(string $sql, array $inputParameters = [])
-    {
+    public function query(string $sql, array $inputParameters = []) {
         if (!$this->isConnected) {
             $this->connect();
         }
@@ -78,8 +77,7 @@ class DB
      *
      * @return array
      */
-    public function getArray(string $sql, array $inputParameters = [])
-    {
+    public function getArray(string $sql, array $inputParameters = []) {
         $sth = $this->query($sql, $inputParameters);
 
         $result = $sth->fetchAll();
@@ -95,8 +93,7 @@ class DB
      *
      * @return array
      */
-    public function getRow(string $sql, array $inputParameters = [])
-    {
+    public function getRow(string $sql, array $inputParameters = []) {
         $sth = $this->query($sql, $inputParameters);
 
         $result = $sth->fetch();
@@ -112,8 +109,7 @@ class DB
      *
      * @return mixed
      */
-    public function getOne(string $sql, array $inputParameters = [])
-    {
+    public function getOne(string $sql, array $inputParameters = []) {
         $row = $this->getRow($sql, $inputParameters);
 
         if (!$row) {
@@ -131,8 +127,7 @@ class DB
      *
      * @return int insert id
      */
-    public function insert(string $into, array $data): int
-    {
+    public function insert(string $into, array $data): int {
         $into = str_replace('.', '`.`', $into);
         $fields = implode('`, `', array_keys($data));
         $values = implode(', ', array_fill(0, count($data), '?'));
@@ -149,12 +144,12 @@ class DB
      *
      * @param string $table table name
      */
-    public function truncate(string $table)
-    {
+    public function truncate(string $table) {
         $table = str_replace('.', '`.`', $table);
 
         $sql = "TRUNCATE TABLE `{$table}`";
 
         $this->query($sql);
     }
+
 }

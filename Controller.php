@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Project: RenderPage
  * File:    Controller.php
@@ -14,8 +15,8 @@ namespace renderpage\libs;
 /**
  * This is Controller class
  */
-class Controller
-{
+class Controller {
+
     /**
      * Instance of Request class
      *
@@ -47,8 +48,7 @@ class Controller
     /**
      * Init
      */
-    public function __construct()
-    {
+    public function __construct() {
         // Create instance of Request class
         $this->request = Request::getInstance();
 
@@ -62,16 +62,14 @@ class Controller
     /**
      * Before action
      */
-    public function before()
-    {
+    public function before() {
         // none
     }
 
     /**
      * After action
      */
-    public function after()
-    {
+    public function after() {
         // none
     }
 
@@ -83,8 +81,7 @@ class Controller
      *
      * @return string
      */
-    public function _(string $category, string $str)
-    {
+    public function _(string $category, string $str) {
         return $this->language->_($category, $str);
     }
 
@@ -92,13 +89,13 @@ class Controller
      * Redirect
      *
      * @param string $location
-     * @param int $code
+     * @param int $httpResponseCode
      *
      * @return string
      */
-    public function redirect(string $location, int $httpResponseCode = 302): string
-    {
+    public function redirect(string $location, int $httpResponseCode = 302): string {
         header("Location: {$location}", true, $httpResponseCode);
         return '';
     }
+
 }

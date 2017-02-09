@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Project: RenderPage
  * File:    SendMail.php
@@ -14,8 +15,8 @@ namespace renderpage\libs;
 /**
  * This is SendMail class
  */
-class SendMail
-{
+class SendMail {
+
     /**
      * Receiver of the mail.
      *
@@ -54,8 +55,7 @@ class SendMail
     /**
      * Init
      */
-    public function __construct()
-    {
+    public function __construct() {
         $this->from = strtoupper($_SERVER['HTTP_HOST']) . '<noreply@' . $_SERVER['HTTP_HOST'] . '>';
     }
 
@@ -64,8 +64,7 @@ class SendMail
      *
      * @param string $header
      */
-    public function addHeader(string $header)
-    {
+    public function addHeader(string $header) {
         $this->headers .= $header . "\r\n";
     }
 
@@ -74,8 +73,7 @@ class SendMail
      *
      * @return boolean
      */
-    public function send()
-    {
+    public function send() {
         $this->addHeader('MIME-Version: 1.0');
         $this->addHeader('Content-Type: text/html; charset=utf-8');
         $this->addHeader("To: {$this->to}");
@@ -83,4 +81,5 @@ class SendMail
         $message = (new View)->render($this->template, false);
         return mail($this->to, $this->subject, $message, $this->headers);
     }
+
 }

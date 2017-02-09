@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Project: RenderPage
  * File:    RenderPageException.php
@@ -17,8 +18,8 @@ use ErrorException;
 /**
  * This is RenderPageException class
  */
-class RenderPageException extends ErrorException
-{
+class RenderPageException extends ErrorException {
+
     /**
      * Init
      *
@@ -30,12 +31,7 @@ class RenderPageException extends ErrorException
      * @param Exception $previous
      */
     public function __construct(
-        $message,
-        $code = 0,
-        $severity = E_ERROR,
-        $filename = __FILE__,
-        $line = __LINE__,
-        $previous = NULL
+    $message, $code = 0, $severity = E_ERROR, $filename = __FILE__, $line = __LINE__, $previous = NULL
     ) {
         parent::__construct($message, $code, $severity, $filename, $line, $previous);
     }
@@ -45,19 +41,18 @@ class RenderPageException extends ErrorException
      *
      * @param Exception $e
      */
-    public static function exceptionHandler($e)
-    {
+    public static function exceptionHandler($e) {
         // 500 Internal Server Error
         header('Content-Type: text/html; charset=utf-8', true, 500);
 
         // Get information
-        $class   = get_class($e);
-        $code    = $e->getCode();
+        $class = get_class($e);
+        $code = $e->getCode();
         $message = $e->getMessage();
-        $file    = $e->getFile();
-        $line    = $e->getLine();
-        $trace   = $e->getTrace();
-        $source  = self::source($file, $line);
+        $file = $e->getFile();
+        $line = $e->getLine();
+        $trace = $e->getTrace();
+        $source = self::source($file, $line);
 
         // Write to file
         $log = "{$message} in {$file} on line {$line}";
@@ -84,8 +79,7 @@ class RenderPageException extends ErrorException
      * @param int $errline
      * @param array $errcontext
      */
-    public static function errorHandler($errno, $errstr, $errfile = '', $errline = 0, $errcontext = [])
-    {
+    public static function errorHandler($errno, $errstr, $errfile = '', $errline = 0, $errcontext = []) {
         throw new RenderPageException($errstr, $errno, E_ERROR, $errfile, $errline);
     }
 
@@ -97,8 +91,7 @@ class RenderPageException extends ErrorException
      *
      * @return string|boolean
      */
-    public static function source($filename, $lineNumber, $padding = 5)
-    {
+    public static function source($filename, $lineNumber, $padding = 5) {
         if (!is_readable($filename)) {
             return false;
         }
@@ -106,7 +99,7 @@ class RenderPageException extends ErrorException
         $fileHandle = fopen($filename, 'r');
         $line = 0;
         $range = ['start' => $lineNumber - $padding, 'end' => $lineNumber + $padding];
-        $format = '% '.strlen($range['end']).'d';
+        $format = '% ' . strlen($range['end']) . 'd';
         $source = '';
 
         while (($row = fgets($fileHandle)) !== false) {
@@ -117,12 +110,12 @@ class RenderPageException extends ErrorException
             if ($line >= $range['start']) {
                 $row = htmlspecialchars($row, ENT_NOQUOTES, RenderPage::$charset);
 
-                $row = '<span class="number">' . sprintf($format, $line) . '</span> '.$row;
+                $row = '<span class="number">' . sprintf($format, $line) . '</span> ' . $row;
 
                 if ($line === $lineNumber) {
-                    $row = '<span class="line highlight">'.$row.'</span>';
+                    $row = '<span class="line highlight">' . $row . '</span>';
                 } else {
-                    $row = '<span class="line">'.$row.'</span>';
+                    $row = '<span class="line">' . $row . '</span>';
                 }
 
                 $source .= $row;
@@ -133,4 +126,5 @@ class RenderPageException extends ErrorException
 
         return $source;
     }
+
 }

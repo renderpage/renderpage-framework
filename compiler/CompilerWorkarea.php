@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Project: RenderPage
  * File:    CompilerWorkarea.php
@@ -14,8 +15,8 @@ namespace renderpage\libs\compiler;
 /**
  * This is CompilerWorkarea class
  */
-class CompilerWorkarea
-{
+class CompilerWorkarea {
+
     /**
      * Instance of Compiler class
      *
@@ -30,14 +31,14 @@ class CompilerWorkarea
      *
      * @return mixed
      */
-    public function parseExpr($params)
-    {
-        /*if ($params['name'] == 'workarea') {
-            $result = $params;
-            $result['inc'] = $compiler->parse($compiler->files['template']['filename']);
-            return $result;
-        }*/
+    public function parseExpr($params) {
+        /* if ($params['name'] == 'workarea') {
+          $result = $params;
+          $result['inc'] = $compiler->parse($compiler->files['template']['filename']);
+          return $result;
+          } */
 
         return false;
     }
+
 }

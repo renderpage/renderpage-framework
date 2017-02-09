@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Project: RenderPage
  * File:    CompilerEcho.php
@@ -14,8 +15,8 @@ namespace renderpage\libs\compiler;
 /**
  * This is CompilerEcho class
  */
-class CompilerEcho
-{
+class CompilerEcho {
+
     /**
      * Instance of Compiler class
      *
@@ -30,9 +31,9 @@ class CompilerEcho
      *
      * @return string
      */
-    public function openTag($params)
-    {
+    public function openTag($params) {
         $varName = $this->compiler->getVariable($params[0]);
         return "<?php if (isset({$varName})) { echo {$varName}; }; ?>";
     }
+
 }

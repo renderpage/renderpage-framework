@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Project: RenderPage
  * File:    Compiler.php
@@ -14,8 +15,8 @@ namespace renderpage\libs;
 /**
  * This is Compiler class
  */
-class Compiler
-{
+class Compiler {
+
     /**
      * Left-delimiter
      *
@@ -54,8 +55,7 @@ class Compiler
     /**
      * Init
      */
-    public function __construct()
-    {
+    public function __construct() {
         // none
     }
 
@@ -67,8 +67,7 @@ class Compiler
      *
      * @return int
      */
-    public function writeFile(string $filename, string $data)
-    {
+    public function writeFile(string $filename, string $data) {
         $dir = dirname($filename);
         if (!is_dir($dir)) {
             mkdir($dir);
@@ -90,8 +89,7 @@ class Compiler
      *
      * @return string
      */
-    public function getVariable(string $name)
-    {
+    public function getVariable(string $name) {
         $name = str_replace(['$', '.'], ['', "']['"], $name);
         return "\$this->variables['{$name}']";
     }
@@ -103,8 +101,7 @@ class Compiler
      *
      * @return array
      */
-    public function parseExpr(string $expr)
-    {
+    public function parseExpr(string $expr) {
         $aExpr = array_diff(preg_split("/ |\t|\n/", $expr), ['']);
         $result['name'] = array_shift($aExpr);
         $result['params'] = $aExpr;
@@ -130,39 +127,38 @@ class Compiler
     }
 
     /**
-     * Parse tree 
+     * Parse tree
      *
      * @param array $parseTree
      *
      * @return array
      */
-    public function parseTree(array $parseTree)
-    {
-        /*$result = [];
-        $openTag = 0;
-        $closeTag = 0;
-        $nParseTree = count($parseTree);
+    public function parseTree(array $parseTree) {
+        /* $result = [];
+          $openTag = 0;
+          $closeTag = 0;
+          $nParseTree = count($parseTree);
 
-        for ($i = 0; $i < $nParseTree; $i++) {
+          for ($i = 0; $i < $nParseTree; $i++) {
 
-            if ($parseTree[$i]['type'] == 'expr') {
-                if ($parseTree[$i]['expr']['name'] == 'foreach') {
-                    $openTag = $i;
-                }
+          if ($parseTree[$i]['type'] == 'expr') {
+          if ($parseTree[$i]['expr']['name'] == 'foreach') {
+          $openTag = $i;
+          }
 
-                if ($parseTree[$i]['expr']['name'] == '/foreach') {
-                    $closeTag = $i;
-                    $inc = array_slice($parseTree, $openTag + 1, $closeTag - $nParseTree);
-                    $parseTree[$openTag]['expr']['inc'] = $inc;
+          if ($parseTree[$i]['expr']['name'] == '/foreach') {
+          $closeTag = $i;
+          $inc = array_slice($parseTree, $openTag + 1, $closeTag - $nParseTree);
+          $parseTree[$openTag]['expr']['inc'] = $inc;
 
-                    // Remove
-                    for ($j = $openTag + 1; $j < $closeTag; $j++) {
-                        $parseTree[$j]['type'] = 'rm';                        
-                    }
-                }
-            }
+          // Remove
+          for ($j = $openTag + 1; $j < $closeTag; $j++) {
+          $parseTree[$j]['type'] = 'rm';
+          }
+          }
+          }
 
-        }*/
+          } */
 
         $result = $parseTree;
 
@@ -176,8 +172,7 @@ class Compiler
      *
      * @return array
      */
-    public function parse(string $filename)
-    {
+    public function parse(string $filename) {
         $result = [];
         $buffer = '';
 
@@ -188,26 +183,26 @@ class Compiler
                 ++$line;
             }
             switch ($char) {
-            case $this->leftDelimiter:
-                $result[] = [
-                    'filename' => $filename,
-                    'line'     => $line,
-                    'type'     => 'raw',
-                    'data'     => $buffer
-                ];
-                $buffer = '';
-                break;
-            case $this->rightDelimiter:
-                $result[] = [
-                    'filename' => $filename,
-                    'line'     => $line,
-                    'type'     => 'expr',
-                    'expr'     => $this->parseExpr($buffer)
-                ];
-                $buffer = '';
-                break;
-            default:
-                $buffer .= $char;
+                case $this->leftDelimiter:
+                    $result[] = [
+                        'filename' => $filename,
+                        'line' => $line,
+                        'type' => 'raw',
+                        'data' => $buffer
+                    ];
+                    $buffer = '';
+                    break;
+                case $this->rightDelimiter:
+                    $result[] = [
+                        'filename' => $filename,
+                        'line' => $line,
+                        'type' => 'expr',
+                        'expr' => $this->parseExpr($buffer)
+                    ];
+                    $buffer = '';
+                    break;
+                default:
+                    $buffer .= $char;
             }
         }
         fclose($fp);
@@ -215,9 +210,9 @@ class Compiler
         if ($buffer != '') {
             $result[] = [
                 'filename' => $filename,
-                'line'     => $line,
-                'type'     => 'raw',
-                'data'     => $buffer
+                'line' => $line,
+                'type' => 'raw',
+                'data' => $buffer
             ];
         }
 
@@ -233,43 +228,42 @@ class Compiler
      *
      * @return string
      */
-    public function codeGeneration(array $parseTree)
-    {
+    public function codeGeneration(array $parseTree) {
         $result = '';
         $before = '';
 
         foreach ($parseTree as $foo) {
             switch ($foo['type']) {
-            case 'raw':
-                $result .= $foo['data'];
-                $before .= $foo['data'];
-                break;
-            case 'expr':
-                if (!empty($this->instructions[$foo['expr']['name']])) {
-                    $className = $this->instructions[$foo['expr']['name']]['className'];
-                    $method = $this->instructions[$foo['expr']['name']]['method'];
+                case 'raw':
+                    $result .= $foo['data'];
+                    $before .= $foo['data'];
+                    break;
+                case 'expr':
+                    if (!empty($this->instructions[$foo['expr']['name']])) {
+                        $className = $this->instructions[$foo['expr']['name']]['className'];
+                        $method = $this->instructions[$foo['expr']['name']]['method'];
 
-                    $this->classInst[$className]->filename = $foo['filename'];
-                    $this->classInst[$className]->line = $foo['line'];
+                        $this->classInst[$className]->filename = $foo['filename'];
+                        $this->classInst[$className]->line = $foo['line'];
 
-                    $result .= $this->classInst[$className]->$method($foo['expr']['params']);
-                }
-
-                if (!empty($foo['expr']['inc'])) {
-                    // Recursion
-                    $buffer = $this->codeGeneration($foo['expr']['inc']);
-
-                    // workarea
-                    if ($foo['expr']['name'] == 'workarea') {
-                        // Indent
-                        if (preg_match('/(?<whitespace>[ ]+)$/', $before, $matches)) {
-                            $buffer = ltrim(preg_replace('!^!m', $matches['whitespace'], trim($buffer)));
-                        }
+                        $result .= $this->classInst[$className]->$method($foo['expr']['params']);
                     }
 
-                    $result .= $buffer;
-                }
-                break;
+                    if (!empty($foo['expr']['inc'])) {
+                        // Recursion
+                        $buffer = $this->codeGeneration($foo['expr']['inc']);
+
+                        // workarea
+                        if ($foo['expr']['name'] == 'workarea') {
+                            // Indent
+                            if (preg_match('/(?<whitespace>[ ]+)$/', $before, $matches)) {
+                                $buffer = ltrim(preg_replace('!^!m', $matches['whitespace'], trim($buffer)));
+                            }
+                        }
+
+                        $result .= $buffer;
+                    }
+                    break;
             }
         }
 
@@ -282,8 +276,7 @@ class Compiler
      *
      * @return string
      */
-    public function optimization(string $data)
-    {
+    public function optimization(string $data) {
         $data = str_replace('?><?php ', '', $data);
 
         // Strip
@@ -301,8 +294,7 @@ class Compiler
      *
      * @return int
      */
-    public function compile($view, string $template, $layout): int
-    {
+    public function compile($view, string $template, $layout): int {
         // Load needed external files
         foreach (glob(RENDERPAGE_DIR . '/compiler/Compiler*.php') as $filename) {
             include_once $filename;
@@ -340,14 +332,14 @@ class Compiler
 
         // Add version
         $data = '<?php $rpVersion = "' .
-                       RenderPage::RENDERPAGE_VERSION .
-                       '"; ?>' . $data;
+                RenderPage::RENDERPAGE_VERSION .
+                '"; ?>' . $data;
 
         // Add compile comment
         $data = '<?php /* RenderPage version: ' .
-                       RenderPage::RENDERPAGE_VERSION . ', ' .
-                       'created on ' . date('c') .
-                       ' */ ?>' . $data;
+                RenderPage::RENDERPAGE_VERSION . ', ' .
+                'created on ' . date('c') .
+                ' */ ?>' . $data;
 
         // Code optimization
         $data = $this->optimization($data);
@@ -361,8 +353,7 @@ class Compiler
      *
      * @param string $compileFilename
      */
-    public function compileLanguages(string $compileFilename)
-    {
+    public function compileLanguages(string $compileFilename) {
         $strings = [];
 
         foreach (glob(APP_DIR . '/languages/*/*.xml') as $filename) {
@@ -373,7 +364,7 @@ class Compiler
 
             foreach ($xml->children() as $child) {
                 $attributes = $child->attributes();
-                $strings[$code][$category][(string)$attributes->name] = (string)$child[0];
+                $strings[$code][$category][(string) $attributes->name] = (string) $child[0];
             }
 
             $data = "<?php return " . var_export($strings, true) . ";";
@@ -382,4 +373,5 @@ class Compiler
             $this->writeFile($compileFilename, $data);
         }
     }
+
 }

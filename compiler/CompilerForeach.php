@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Project: RenderPage
  * File:    CompilerForeach.php
@@ -14,8 +15,8 @@ namespace renderpage\libs\compiler;
 /**
  * This is CompilerForeach class
  */
-class CompilerForeach
-{
+class CompilerForeach {
+
     /**
      * Instance of Compiler class
      *
@@ -30,14 +31,13 @@ class CompilerForeach
      *
      * @return string
      */
-    public function openTag($params)
-    {
+    public function openTag($params) {
         $fromVar = $this->compiler->getVariable($params[0]);
         $itemVar = $this->compiler->getVariable($params[2]);
 
         return '<?php ' .
-            "if (!empty({$fromVar}) && is_array({$fromVar})) { " .
-            "foreach ({$fromVar} as {$itemVar}) { ?>";
+                "if (!empty({$fromVar}) && is_array({$fromVar})) { " .
+                "foreach ({$fromVar} as {$itemVar}) { ?>";
     }
 
     /**
@@ -47,8 +47,8 @@ class CompilerForeach
      *
      * @return string
      */
-    public function closeTag($params)
-    {
+    public function closeTag($params) {
         return '<?php } } ?>';
     }
+
 }

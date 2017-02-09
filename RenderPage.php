@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Project: RenderPage
  * File:    RenderPage.php
@@ -68,8 +69,8 @@ set_error_handler(['\renderpage\libs\RenderPageException', 'errorHandler']);
 /**
  * This is the main RenderPage class
  */
-class RenderPage
-{
+class RenderPage {
+
     /**
      * RenderPage version
      */
@@ -120,8 +121,7 @@ class RenderPage
     /**
      * Init
      */
-    public function __construct()
-    {
+    public function __construct() {
         // Debug mode
         if (RENDERPAGE_DEBUG) {
             self::$forceCompile = true;
@@ -136,8 +136,7 @@ class RenderPage
      *
      * @return boolean
      */
-    public function route()
-    {
+    public function route() {
         $this->route = new Route;
 
         $this->route->run();
@@ -154,8 +153,7 @@ class RenderPage
     /**
      * Application execute
      */
-    public function execute()
-    {
+    public function execute() {
         if (!empty($this->controller)) {
             // Before action
             $this->controller->before();
@@ -171,8 +169,7 @@ class RenderPage
     /**
      * Outputting data
      */
-    public function output()
-    {
+    public function output() {
         if ($this->outputData === false) {
             header('Content-Type: text/html; charset=utf-8', true, 404);
             $view = new View;
@@ -201,4 +198,5 @@ class RenderPage
             echo $this->outputData;
         }
     }
+
 }

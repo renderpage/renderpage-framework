@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Project: RenderPage
  * File:    CompilerException.php
@@ -14,8 +15,8 @@ namespace renderpage\libs;
 /**
  * This is CompilerException class
  */
-class CompilerException extends RenderPageException
-{
+class CompilerException extends RenderPageException {
+
     /**
      * Init
      *
@@ -27,13 +28,9 @@ class CompilerException extends RenderPageException
      * @param Exception $previous
      */
     public function __construct(
-        $message,
-        $code = 0,
-        $severity = E_ERROR,
-        $filename = __FILE__,
-        $line = __LINE__,
-        $previous = NULL
+    $message, $code = 0, $severity = E_ERROR, $filename = __FILE__, $line = __LINE__, $previous = NULL
     ) {
         parent::__construct($message, $code, $severity, $filename, $line, $previous);
     }
+
 }

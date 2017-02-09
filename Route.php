@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Project: RenderPage
  * File:    Route.php
@@ -14,8 +15,8 @@ namespace renderpage\libs;
 /**
  * This is Route class
  */
-class Route
-{
+class Route {
+
     /**
      * Controller directory
      *
@@ -82,8 +83,7 @@ class Route
     /**
      * Init
      */
-    public function __construct()
-    {
+    public function __construct() {
         // Get url path
         $this->urlPath = Request::getInstance()->getUrlPath();
     }
@@ -94,8 +94,7 @@ class Route
      * @param string $pattern
      * @param string $params
      */
-    public function addRouteRule($pattern, $params = [])
-    {
+    public function addRouteRule($pattern, $params = []) {
         $this->routeRules[$pattern] = $params;
     }
 
@@ -106,9 +105,8 @@ class Route
      *
      * @return string
      */
-    private function getControllerName($str)
-    {
-        return str_replace(' ' , '', ucwords(str_replace('-' , ' ', $str))) . 'Controller';
+    private function getControllerName($str) {
+        return str_replace(' ', '', ucwords(str_replace('-', ' ', $str))) . 'Controller';
     }
 
     /**
@@ -118,8 +116,7 @@ class Route
      *
      * @return string
      */
-    private function getControllerFilename($controllerName)
-    {
+    private function getControllerFilename($controllerName) {
         return APP_DIR . "/{$this->controllerDir}/{$controllerName}.php";
     }
 
@@ -130,9 +127,8 @@ class Route
      *
      * @return string
      */
-    private function getActionName($str)
-    {
-        return 'action' . str_replace(' ' , '', ucwords(str_replace('-' , ' ', $str)));
+    private function getActionName($str) {
+        return 'action' . str_replace(' ', '', ucwords(str_replace('-', ' ', $str)));
     }
 
     /**
@@ -140,8 +136,7 @@ class Route
      *
      * @return boolean
      */
-    public function run()
-    {
+    public function run() {
         include_once APP_DIR . '/route.php';
 
         foreach ($this->routeRules as $pattern => $params) {
@@ -187,4 +182,5 @@ class Route
 
         return false;
     }
+
 }

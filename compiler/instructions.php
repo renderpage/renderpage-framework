@@ -1,4 +1,6 @@
-<?php return $instructions = [
+<?php
+
+return $instructions = [
     'echo' => [
         'className' => '\renderpage\libs\compiler\CompilerEcho',
         'method' => 'openTag'

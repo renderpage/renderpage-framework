@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Project: RenderPage
  * File:    CompilerLanguage.php
@@ -14,8 +15,8 @@ namespace renderpage\libs\compiler;
 /**
  * This is CompilerLanguage class
  */
-class CompilerLanguage
-{
+class CompilerLanguage {
+
     /**
      * Instance of Compiler class
      *
@@ -30,8 +31,8 @@ class CompilerLanguage
      *
      * @return string
      */
-    public function _($params)
-    {
+    public function _($params) {
         return "<?php echo \$this->language->_('{$params[0]}', '{$params[1]}'); ?>";
     }
+
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Project: RenderPage
  * File:    CompilerIf.php
@@ -16,29 +17,26 @@ use renderpage\libs\CompilerException;
 /**
  * This is CompilerIf class
  */
-class CompilerIf
-{
+class CompilerIf {
+
     /**
      * Instance of Compiler class
      *
      * @var object
      */
     public $compiler;
-
     public $filename;
-
     public $line;
-
     private $comparisonOperators = [
-        '==',  // Equal
+        '==', // Equal
         '===', // Identical
-        '!=',  // Not equal
-        '<>',  // Not equal
+        '!=', // Not equal
+        '<>', // Not equal
         '!==', // Not identical
-        '<',   // Less than
-        '>',   // Greater than
-        '<=',  // Less than or equal to
-        '>=',  // Greater than or equal to
+        '<', // Less than
+        '>', // Greater than
+        '<=', // Less than or equal to
+        '>=', // Greater than or equal to
         '<=>'  // Spaceship
     ];
 
@@ -49,8 +47,7 @@ class CompilerIf
      *
      * @return string
      */
-    public function openTag($params)
-    {
+    public function openTag($params) {
         if (!empty($params[3])) {
             throw new CompilerException('Parse error: syntax error - too many args', 0, E_ERROR, $this->filename, $this->line);
         }
@@ -79,8 +76,8 @@ class CompilerIf
      *
      * @return string
      */
-    public function closeTag($params)
-    {
+    public function closeTag($params) {
         return '<?php } ?>';
     }
+
 }

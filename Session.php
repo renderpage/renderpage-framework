@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Project: RenderPage
  * File:    Session.php
@@ -14,8 +15,8 @@ namespace renderpage\libs;
 /**
  * This is Session class
  */
-class Session
-{
+class Session {
+
     /**
      * Singleton trait
      */
@@ -29,8 +30,7 @@ class Session
     /**
      * Init
      */
-    public function start()
-    {
+    public function start() {
         if (file_exists(APP_DIR . '/conf/session.php')) {
             $conf = require APP_DIR . '/conf/session.php';
             if (isset($conf['name'])) {
@@ -57,8 +57,7 @@ class Session
      *
      * @return mixed
      */
-    public function get(string $name)
-    {
+    public function get(string $name) {
         $this->start();
 
         if (isset($_SESSION[$name])) {
@@ -76,8 +75,7 @@ class Session
      *
      * @return void
      */
-    public function set(string $name, $value)
-    {
+    public function set(string $name, $value) {
         $this->start();
 
         $_SESSION[$name] = $value;
@@ -90,10 +88,10 @@ class Session
      *
      * @return void
      */
-    public function del(string $name)
-    {
+    public function del(string $name) {
         $this->start();
 
         unset($_SESSION[$name]);
     }
+
 }

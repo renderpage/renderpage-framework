@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Project: RenderPage
  * File:    Model.php
@@ -14,8 +15,8 @@ namespace renderpage\libs;
 /**
  * This is Model class
  */
-class Model
-{
+class Model {
+
     /**
      * Instance of Language class
      *
@@ -33,8 +34,7 @@ class Model
     /**
      * Init
      */
-    public function __construct()
-    {
+    public function __construct() {
         // Create instance of Language class
         $this->language = Language::getInstance();
 
@@ -49,8 +49,7 @@ class Model
      *
      * @return mixed
      */
-    public function __get(string $name)
-    {
+    public function __get(string $name) {
         $method = "get{$name}";
         return $this->{$method}();
     }
@@ -61,8 +60,7 @@ class Model
      * @param string $name property name
      * @param mixed $value parameter passed to setter
      */
-    public function __set(string $name, $value)
-    {
+    public function __set(string $name, $value) {
         $method = "set{$name}";
         $this->{$method}($value);
     }
@@ -75,8 +73,8 @@ class Model
      *
      * @return string
      */
-    public function _(string $category, string $str)
-    {
+    public function _(string $category, string $str) {
         return $this->language->_($category, $str);
     }
+
 }

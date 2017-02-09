@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Project: RenderPage
  * File:    Language.php
@@ -14,8 +15,8 @@ namespace renderpage\libs;
 /**
  * This is Language class
  */
-class Language
-{
+class Language {
+
     /**
      * Singleton trait
      */
@@ -38,8 +39,7 @@ class Language
     /**
      * Load XML files
      */
-    public function loadFiles()
-    {
+    public function loadFiles() {
         // Get compile filename
         $compileFilename = COMPILE_DIR . "/xml_languages.php";
 
@@ -64,8 +64,7 @@ class Language
      *
      * @param string $code
      */
-    public function setCurrentLanguage(string $code)
-    {
+    public function setCurrentLanguage(string $code) {
         $this->code = $code;
     }
 
@@ -77,8 +76,7 @@ class Language
      *
      * @return string
      */
-    public function _(string $category, string $str): string
-    {
+    public function _(string $category, string $str): string {
         if (empty($this->strings)) {
             $this->loadFiles();
         }
@@ -89,4 +87,5 @@ class Language
 
         return $str;
     }
+
 }

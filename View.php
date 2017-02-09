@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Project: RenderPage
  * File:    View.php
@@ -14,8 +15,8 @@ namespace renderpage\libs;
 /**
  * This is View class
  */
-class View
-{
+class View {
+
     /**
      * Template directory
      *
@@ -50,8 +51,7 @@ class View
     /**
      * Init
      */
-    public function __construct()
-    {
+    public function __construct() {
         // Create instance of Language class
         $this->language = Language::getInstance();
     }
@@ -62,8 +62,7 @@ class View
      * @param string $name var name
      * @param mixed $value value var
      */
-    public function setVar(string $name, $value)
-    {
+    public function setVar(string $name, $value) {
         $this->variables[$name] = $value;
     }
 
@@ -72,8 +71,7 @@ class View
      *
      * @param string $href css file
      */
-    public function addCss(string $href)
-    {
+    public function addCss(string $href) {
         $this->variables['cssFiles'][] = ['href' => $href];
     }
 
@@ -82,8 +80,7 @@ class View
      *
      * @param string $src js file
      */
-    public function addScript(string $src)
-    {
+    public function addScript(string $src) {
         $this->variables['jsFiles'][] = ['src' => $src];
     }
 
@@ -94,8 +91,7 @@ class View
      *
      * @return string
      */
-    public function getTemplateFilename(string $template)
-    {
+    public function getTemplateFilename(string $template) {
         $filename = APP_DIR . "/{$this->templateDir}/{$template}{$this->extension}";
         if (!file_exists($filename)) {
             $filename = RENDERPAGE_DIR . "/templates/{$template}{$this->extension}";
@@ -113,8 +109,7 @@ class View
      *
      * @return string
      */
-    public function getLayoutFilename(string $layout)
-    {
+    public function getLayoutFilename(string $layout) {
         $filename = APP_DIR . "/{$this->templateDir}/layouts/{$layout}{$this->extension}";
         if (!file_exists($filename)) {
             $filename = RENDERPAGE_DIR . "/{$this->templateDir}/layouts/{$layout}{$this->extension}";
@@ -133,8 +128,7 @@ class View
      *
      * @return string
      */
-    public function getCompileFilename(string $template, string $layout)
-    {
+    public function getCompileFilename(string $template, string $layout) {
         if (!$templateFilename = $this->getTemplateFilename($template)) {
             return false;
         }
@@ -157,8 +151,7 @@ class View
      *
      * @param string $template template name
      */
-    public function clearCompiledTemplates($template = NULL)
-    {
+    public function clearCompiledTemplates($template = NULL) {
         $compiledTplPattern = COMPILE_DIR . "/tpl_";
         if ($template) {
             $compiledTplPattern .= str_replace('/', '_ds_', $template);
@@ -177,8 +170,7 @@ class View
      *
      * @return mixed
      */
-    public function render(string $template, $layout = 'default')
-    {
+    public function render(string $template, $layout = 'default') {
         // Get compile filename
         $compileFilename = $this->getCompileFilename($template, $layout);
 
@@ -206,4 +198,5 @@ class View
 
         return ob_get_clean();
     }
+
 }

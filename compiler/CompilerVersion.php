@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Project: RenderPage
  * File:    CompilerVersion.php
@@ -14,8 +15,8 @@ namespace renderpage\libs\compiler;
 /**
  * This is CompilerVersion class
  */
-class CompilerVersion
-{
+class CompilerVersion {
+
     /**
      * Instance of Compiler class
      *
@@ -30,8 +31,8 @@ class CompilerVersion
      *
      * @return string
      */
-    public function getVersion($params)
-    {
+    public function getVersion($params) {
         return \renderpage\libs\RenderPage::RENDERPAGE_VERSION;
     }
+
 }

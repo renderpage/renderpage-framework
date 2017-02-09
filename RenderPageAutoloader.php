@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Project: RenderPage
  * File:    RenderPageAutoloader.php
@@ -14,15 +15,14 @@ namespace renderpage\libs;
 /**
  * This is Autoloader class
  */
-class RenderPageAutoloader
-{
+class RenderPageAutoloader {
+
     /**
      * Get full path to file.
      *
      * @param string $class class name.
      */
-    private static function getFilename($class)
-    {
+    private static function getFilename($class) {
         if (strpos($class, __NAMESPACE__) !== false) {
             return RENDERPAGE_DIR . DIRECTORY_SEPARATOR . substr($class, strlen(__NAMESPACE__) + 1) . '.php';
         }
@@ -34,11 +34,11 @@ class RenderPageAutoloader
      *
      * @param string $class class name.
      */
-    public static function autoload($class)
-    {
+    public static function autoload($class) {
         $filename = self::getFilename($class);
         if (file_exists($filename)) {
             include_once $filename;
         }
     }
+
 }

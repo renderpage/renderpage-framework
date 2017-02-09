@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Project: RenderPage
  * File:    Singleton.php
@@ -15,27 +16,24 @@ trait Singleton {
 
     private static $instance;
 
-    private function __construct()
-    {
+    private function __construct() {
         // none
     }
 
-    private function __clone()
-    {
+    private function __clone() {
         // none
     }
 
-    private function __wakeup()
-    {
-         // none
+    private function __wakeup() {
+        // none
     }
 
-    public static function getInstance()
-    {
+    public static function getInstance() {
         if (empty(self::$instance)) {
             self::$instance = new self;
         }
 
         return self::$instance;
     }
+
 }
