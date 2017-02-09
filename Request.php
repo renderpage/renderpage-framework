@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Project: RenderPage
  * File:    Request.php
@@ -14,23 +15,41 @@ namespace renderpage\libs;
 /**
  * This is Request class
  */
-class Request
-{
+class Request {
+
     /**
      * Singleton trait
      */
     use traits\Singleton;
 
     /**
+     * <<magic>> Getter.
+     *
+     * @param string $name property name
+     *
+     * @return mixed
+     */
+    public function __get(string $name) {
+        $method = "get{$name}";
+        return $this->{$method}();
+    }
+
+    /**
+     * Uniform Resource Identifier
+     * @return mixed
+     */
+    public function getRequestUri() {
+        return filter_input(INPUT_SERVER, 'REQUEST_URI');
+    }
+
+    /**
      * Get url path
      *
      * @return string
      */
-    public function getUrlPath()
-    {
+    public function getUrlPath() {
         // Remove query
-        $urlPath = explode('?', $_SERVER['REQUEST_URI']);
-        $urlPath = array_shift($urlPath);
+        $urlPath = current(explode('?', $this->requestUri));
 
         // Remove duplicate slashes
         $urlPath = '/' . implode('/', array_diff(explode('/', $urlPath), ['']));
@@ -39,12 +58,22 @@ class Request
     }
 
     /**
+     * Is a POST request
+     * @return boolean
+     */
+    public function getIsPost() {
+        $requestMethod = filter_input(INPUT_SERVER, 'REQUEST_METHOD');
+        return $requestMethod === 'POST' ? true : false;
+    }
+
+    /**
      * Is XMLHttpRequest request
      *
      * @return boolean
      */
-    public function getIsAjax()
-    {
-        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
+    public function getIsAjax() {
+        $xRequestedWith = filter_input(INPUT_SERVER, 'HTTP_X_REQUESTED_WITH');
+        return $xRequestedWith === 'XMLHttpRequest';
     }
+
 }
