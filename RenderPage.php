@@ -91,6 +91,13 @@ class RenderPage {
     public static $charset = 'utf-8';
 
     /**
+     * Instance of Request class
+     *
+     * @var object
+     */
+    public $request;
+
+    /**
      * Instance of Language class
      *
      * @var object
@@ -126,6 +133,9 @@ class RenderPage {
         if (RENDERPAGE_DEBUG) {
             self::$forceCompile = true;
         }
+
+        // Create instance of Request class
+        $this->request = Request::getInstance();
 
         // Create instance of Language class
         $this->language = Language::getInstance();

@@ -35,7 +35,26 @@ class Request {
     }
 
     /**
+     * HTTP host
+     *
+     * @return string
+     */
+    public function getHost() {
+        return filter_input(INPUT_SERVER, 'HTTP_HOST');
+    }
+
+    /**
+     * Gets generic Top-Level Domain
+     *
+     * @return mixed
+     */
+    public function getGTLD() {
+        return substr(strrchr($this->host, '.'), 1);
+    }
+
+    /**
      * Uniform Resource Identifier
+     *
      * @return mixed
      */
     public function getRequestUri() {
@@ -59,6 +78,7 @@ class Request {
 
     /**
      * Is a POST request
+     *
      * @return boolean
      */
     public function getIsPost() {
