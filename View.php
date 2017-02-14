@@ -89,17 +89,18 @@ class View {
      *
      * @param string $template template name
      *
-     * @return string
+     * @return string|boolean
      */
     public function getTemplateFilename(string $template) {
         $filename = APP_DIR . "/{$this->templateDir}/{$template}{$this->extension}";
-        if (!file_exists($filename)) {
-            $filename = RENDERPAGE_DIR . "/templates/{$template}{$this->extension}";
+        if (file_exists($filename)) {
+            return $filename;
         }
-        if (!file_exists($filename)) {
-            throw new RenderPageException('Template file not found: ' . $filename);
+        $filename = RENDERPAGE_DIR . "/templates/{$template}{$this->extension}";
+        if (file_exists($filename)) {
+            return $filename;
         }
-        return $filename;
+        return false;
     }
 
     /**
@@ -107,17 +108,18 @@ class View {
      *
      * @param string $layout layout name
      *
-     * @return string
+     * @return string|boolean
      */
     public function getLayoutFilename(string $layout) {
         $filename = APP_DIR . "/{$this->templateDir}/layouts/{$layout}{$this->extension}";
-        if (!file_exists($filename)) {
-            $filename = RENDERPAGE_DIR . "/{$this->templateDir}/layouts/{$layout}{$this->extension}";
+        if (file_exists($filename)) {
+            return $filename;
         }
-        if (!file_exists($filename)) {
-            throw new RenderPageException('Layout file not found: ' . $filename);
+        $filename = RENDERPAGE_DIR . "/{$this->templateDir}/layouts/{$layout}{$this->extension}";
+        if (file_exists($filename)) {
+            return $filename;
         }
-        return $filename;
+        return false;
     }
 
     /**

@@ -311,13 +311,21 @@ class Compiler {
         // Remove old compile files
         $view->clearCompiledTemplates($template);
 
+        $templateFilename = $view->getTemplateFilename($template);
+        if (!$templateFilename) {
+            throw new CompilerException('Template "' . $template . '" not found');
+        }
         $this->files['template'] = [
-            'filename' => $view->getTemplateFilename($template)
+            'filename' => $templateFilename
         ];
 
         if ($layout) {
+            $layoutFilename = $view->getLayoutFilename($layout);
+            if (!$layoutFilename) {
+                throw new CompilerException('Layout "' . $layout . '" not found');
+            }
             $this->files['layout'] = [
-                'filename' => $view->getLayoutFilename($layout)
+                'filename' => $layoutFilename
             ];
             $parseFilename = $this->files['layout']['filename'];
         } else {
