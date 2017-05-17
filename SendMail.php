@@ -75,7 +75,7 @@ class SendMail {
      */
     public function send() {
         $this->addHeader('MIME-Version: 1.0');
-        $this->addHeader('Content-Type: text/html; charset=utf-8');
+        $this->addHeader('Content-Type: text/html; charset=' . RenderPage::$charset);
         $this->addHeader("To: {$this->to}");
         $this->addHeader("From: {$this->from}");
         $message = (new View)->render($this->template, false);

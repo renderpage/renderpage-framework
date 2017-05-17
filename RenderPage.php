@@ -88,7 +88,7 @@ class RenderPage {
      *
      * @var string
      */
-    public static $charset = 'utf-8';
+    public static $charset = 'UTF-8';
 
     /**
      * Instance of Request class
@@ -181,30 +181,13 @@ class RenderPage {
      */
     public function output() {
         if ($this->outputData === false) {
-            header('Content-Type: text/html; charset=utf-8', true, 404);
-            $view = new View;
-            $view->setVar('title', '404');
-            echo $view->render('404', 'error');
+            header('Content-Type: text/html; charset=' . self::$charset, true, 404);
+            echo (new View)->setVar('title', '404')->render('404', 'error');
         } elseif (is_array($this->outputData)) {
             header('Content-Type: application/json');
             echo json_encode($this->outputData);
         } else {
-            header('Content-Type: text/html; charset=utf-8');
-
-            // HTTP 304 Not Modified
-            if ($this->controller->lastModified > 0) {
-                header_remove('Cache-Control');
-                header_remove('Pragma');
-                header('Expires: ' . gmdate('D, d M Y H:i:s ', strtotime('+1 week')) . 'GMT');
-                $timestamp = max(array_merge(array_map('filemtime', get_included_files()), [$this->controller->lastModified]));
-                $lastModified = gmdate('D, d M Y H:i:s ', $timestamp) . 'GMT';
-                $ifModifiedSince = filter_input(INPUT_SERVER, 'HTTP_IF_MODIFIED_SINCE');
-                if ($ifModifiedSince == $lastModified) {
-                    header('HTTP/1.1 304 Not Modified');
-                }
-                header('Last-Modified: ' . $lastModified);
-            }
-
+            header('Content-Type: text/html; charset=' . self::$charset);
             echo $this->outputData;
         }
     }

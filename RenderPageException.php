@@ -43,7 +43,7 @@ class RenderPageException extends ErrorException {
      */
     public static function exceptionHandler($e) {
         // 500 Internal Server Error
-        header('Content-Type: text/html; charset=utf-8', true, 500);
+        header('Content-Type: text/html; charset=' . RenderPage::$charset, true, 500);
 
         // Get information
         $class = get_class($e);

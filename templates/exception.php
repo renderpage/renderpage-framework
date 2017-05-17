@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
+    <meta charset="<?= renderpage\libs\RenderPage::$charset ?>">
     <title>Exception</title>
     <style>
       body {
@@ -55,16 +55,22 @@
     <pre class="source"><code><?php echo $source; ?></code></pre>
     <h2>Stack trace:</h2>
     <ol class="stack-trace">
-<?php $i = 0; foreach ($trace as $step) { ?>
-      <li value="<?php echo $i; ?>">
-        <span class="file" title="<?php echo $step['file']; ?>"><?php echo basename($step['file']); ?></span>
-        (line: <span class="line"><?php echo $step['line']; ?></span>):
-        <span class="class"><?php echo $step['class']; ?></span><!--
-        --><span class="type"><?php echo $step['type']; ?></span><!--
-        --><span class="function"><?php echo $step['function']; ?></span><!--
-        --><span class="args">(<?php echo count($step['args']) ? '...' : ''; ?>)</span>
-      </li>
-<?php $i++; } ?>
+      <?php
+      $i = 0;
+      foreach ($trace as $step) {
+          ?>
+          <li value="<?php echo $i; ?>">
+            <span class="file" title="<?php echo $step['file']; ?>"><?php echo basename($step['file']); ?></span>
+            (line: <span class="line"><?php echo $step['line']; ?></span>):
+            <span class="class"><?php echo $step['class']; ?></span><!--
+            --><span class="type"><?php echo $step['type']; ?></span><!--
+            --><span class="function"><?php echo $step['function']; ?></span><!--
+            --><span class="args">(<?php echo count($step['args']) ? '...' : ''; ?>)</span>
+          </li>
+          <?php
+          $i++;
+      }
+      ?>
     </ol>
     <hr>
     <p>RenderPage <?php echo renderpage\libs\RenderPage::RENDERPAGE_VERSION; ?></p>

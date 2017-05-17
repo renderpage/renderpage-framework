@@ -64,6 +64,7 @@ class View {
      */
     public function setVar(string $name, $value) {
         $this->variables[$name] = $value;
+        return $this;
     }
 
     /**
@@ -73,6 +74,7 @@ class View {
      */
     public function addCss(string $href) {
         $this->variables['cssFiles'][] = ['href' => $href];
+        return $this;
     }
 
     /**
@@ -82,6 +84,7 @@ class View {
      */
     public function addScript(string $src) {
         $this->variables['jsFiles'][] = ['src' => $src];
+        return $this;
     }
 
     /**
