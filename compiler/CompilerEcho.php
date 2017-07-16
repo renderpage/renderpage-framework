@@ -32,8 +32,7 @@ class CompilerEcho {
      * @return string
      */
     public function openTag($params) {
-        $varName = $this->compiler->getVariable($params[0]);
-        return "<?php echo {$varName} ?? ''; ?>";
+        return '<?= ' . $this->compiler->getVariable($params[0]) . ' ?? \'\'; ?>';
     }
 
 }

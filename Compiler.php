@@ -276,13 +276,8 @@ class Compiler {
      *
      * @return string
      */
-    public function optimization(string $data) {
-        $data = str_replace('?><?php ', '', $data);
-
-        // Strip
-        //$data = preg_replace('!\s+!u', ' ', $data);
-
-        return $data;
+    public function optimization(string $data): string {
+        return preg_replace(['/>\n[ ]+</', '/>\n</', '/ \?><\?php /'], ['><', '><', ' '], $data);
     }
 
     /**

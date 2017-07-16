@@ -32,7 +32,7 @@ class CompilerLanguage {
      * @return string
      */
     public function _($params) {
-        return "<?php echo \$this->language->_('{$params[0]}', '{$params[1]}'); ?>";
+        return "<?= \$this->language->_('{$params[0]}', '{$params[1]}'); ?>";
     }
 
 }
