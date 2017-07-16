@@ -9,6 +9,10 @@ return $instructions = [
         'className' => '\renderpage\libs\compiler\CompilerIf',
         'method' => 'openTag'
     ],
+    'else' => [
+        'className' => '\renderpage\libs\compiler\CompilerIf',
+        'method' => 'elseTag'
+    ],
     '/if' => [
         'className' => '\renderpage\libs\compiler\CompilerIf',
         'method' => 'closeTag'

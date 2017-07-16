@@ -47,7 +47,7 @@ class CompilerIf {
      *
      * @return string
      */
-    public function openTag($params) {
+    public function openTag(array $params): string {
         if (!empty($params[3])) {
             throw new CompilerException('Parse error: syntax error - too many args', 0, E_ERROR, $this->filename, $this->line);
         }
@@ -70,13 +70,24 @@ class CompilerIf {
     }
 
     /**
+     * Else
+     *
+     * @param array $params
+     *
+     * @return string
+     */
+    public function elseTag(): string {
+        return '<?php } else { ?>';
+    }
+
+    /**
      * Endif
      *
      * @param array $params
      *
      * @return string
      */
-    public function closeTag($params) {
+    public function closeTag(): string {
         return '<?php } ?>';
     }
 
