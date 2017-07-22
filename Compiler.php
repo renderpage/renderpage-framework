@@ -89,9 +89,8 @@ class Compiler {
      *
      * @return string
      */
-    public function getVariable(string $name) {
-        $name = str_replace(['$', '.'], ['', "']['"], $name);
-        return "\$this->variables['{$name}']";
+    public function getVariable(string $name): string {
+        return '$this->variables[\'' . str_replace(['$', '.'], ['', "']['"], $name) . '\']';
     }
 
     /**
@@ -187,20 +186,24 @@ class Compiler {
      *
      * @return string
      */
-    public function codeGeneration(array $parseTree) {
+    public function codeGeneration(array $parseTree): string {
         $result = '';
-        $before = '';
 
         foreach ($parseTree as $foo) {
             switch ($foo['type']) {
                 case 'raw':
                     $result .= $foo['data'];
-                    $before .= $foo['data'];
                     break;
                 case 'expr':
                     if (!empty($this->instructions[$foo['expr']['name']])) {
                         $className = $this->instructions[$foo['expr']['name']]['className'];
                         $method = $this->instructions[$foo['expr']['name']]['method'];
+
+                        // Init class
+                        if (!isset($this->classInst[$className])) {
+                            $this->classInst[$className] = new $className;
+                            $this->classInst[$className]->compiler = &$this;
+                        }
 
                         $this->classInst[$className]->filename = $foo['filename'];
                         $this->classInst[$className]->line = $foo['line'];
@@ -210,17 +213,7 @@ class Compiler {
 
                     if (!empty($foo['expr']['inc'])) {
                         // Recursion
-                        $buffer = $this->codeGeneration($foo['expr']['inc']);
-
-                        // workarea
-                        if ($foo['expr']['name'] == 'workarea') {
-                            // Indent
-                            if (preg_match('/(?<whitespace>[ ]+)$/', $before, $matches)) {
-                                $buffer = ltrim(preg_replace('!^!m', $matches['whitespace'], trim($buffer)));
-                            }
-                        }
-
-                        $result .= $buffer;
+                        $result .= $this->codeGeneration($foo['expr']['inc']);
                     }
                     break;
             }
@@ -250,16 +243,6 @@ class Compiler {
      * @return int
      */
     public function compile($view, string $template, $layout): int {
-        // Load needed external files
-        foreach (glob(RENDERPAGE_DIR . '/compiler/Compiler*.php') as $filename) {
-            include_once $filename;
-
-            // Init class
-            $className = '\\renderpage\\libs\\compiler\\' . basename($filename, '.php');
-            $this->classInst[$className] = new $className;
-            $this->classInst[$className]->compiler = $this;
-        }
-
         // Load instructions
         $this->instructions = require_once RENDERPAGE_DIR . '/compiler/instructions.php';
 

@@ -24,7 +24,7 @@ class RenderPageAutoloader {
      */
     private static function getFilename($class) {
         if (strpos($class, __NAMESPACE__) !== false) {
-            return RENDERPAGE_DIR . DIRECTORY_SEPARATOR . substr($class, strlen(__NAMESPACE__) + 1) . '.php';
+            return RENDERPAGE_DIR . DIRECTORY_SEPARATOR . substr(str_replace('\\', DIRECTORY_SEPARATOR, $class), strlen(__NAMESPACE__) + 1) . '.php';
         }
         return dirname(APP_DIR) . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
     }
