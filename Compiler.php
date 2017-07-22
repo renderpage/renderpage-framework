@@ -293,11 +293,6 @@ class Compiler {
         // Code generation
         $data = $this->codeGeneration($parseTree);
 
-        // Add version
-        $data = '<?php $rpVersion = "' .
-                RenderPage::RENDERPAGE_VERSION .
-                '"; ?>' . $data;
-
         // Add compile comment
         $data = '<?php /* RenderPage version: ' .
                 RenderPage::RENDERPAGE_VERSION . ', ' .
