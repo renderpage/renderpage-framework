@@ -127,45 +127,6 @@ class Compiler {
     }
 
     /**
-     * Parse tree
-     *
-     * @param array $parseTree
-     *
-     * @return array
-     */
-    public function parseTree(array $parseTree) {
-        /* $result = [];
-          $openTag = 0;
-          $closeTag = 0;
-          $nParseTree = count($parseTree);
-
-          for ($i = 0; $i < $nParseTree; $i++) {
-
-          if ($parseTree[$i]['type'] == 'expr') {
-          if ($parseTree[$i]['expr']['name'] == 'foreach') {
-          $openTag = $i;
-          }
-
-          if ($parseTree[$i]['expr']['name'] == '/foreach') {
-          $closeTag = $i;
-          $inc = array_slice($parseTree, $openTag + 1, $closeTag - $nParseTree);
-          $parseTree[$openTag]['expr']['inc'] = $inc;
-
-          // Remove
-          for ($j = $openTag + 1; $j < $closeTag; $j++) {
-          $parseTree[$j]['type'] = 'rm';
-          }
-          }
-          }
-
-          } */
-
-        $result = $parseTree;
-
-        return $result;
-    }
-
-    /**
      * Parse
      *
      * @param string $filename file name
@@ -178,8 +139,8 @@ class Compiler {
 
         $fp = fopen($filename, 'r');
         $line = 1;
-        while (false !== ($char = fgetc($fp))) {
-            if ($char == "\n") {
+        while (($char = fgetc($fp)) !== false) {
+            if ($char == PHP_EOL) {
                 ++$line;
             }
             switch ($char) {
@@ -215,8 +176,6 @@ class Compiler {
                 'data' => $buffer
             ];
         }
-
-        $result = $this->parseTree($result);
 
         return $result;
     }
@@ -277,7 +236,8 @@ class Compiler {
      * @return string
      */
     public function optimization(string $data): string {
-        return preg_replace(['/>\n[ ]+</', '/>\n</', '/ \?><\?php /'], ['><', '><', ' '], $data);
+        require_once RENDERPAGE_DIR . '/Minify.php';
+        return Minify::minifyPhp($data);
     }
 
     /**
