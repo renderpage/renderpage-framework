@@ -49,6 +49,13 @@ class View {
     ];
 
     /**
+     * Used for check templates
+     *
+     * @var boolean
+     */
+    private $getFiles = false;
+
+    /**
      * Init
      */
     public function __construct() {
@@ -131,24 +138,15 @@ class View {
      * @param string $template template name
      * @param string|boolean $layout layout template name
      *
-     * @return string
+     * @return string Filename
      */
-    public function getCompileFilename(string $template, string $layout) {
-        if (!$templateFilename = $this->getTemplateFilename($template)) {
-            return false;
-        }
-        $templateLastModified = filemtime($templateFilename);
-        $compileFilename = COMPILE_DIR . "/tpl_";
-        $compileFilename .= str_replace('/', '_ds_', $template);
-        $compileFilename .= "_{$templateLastModified}";
+    public function getCompileFilename(string $template, $layout): string {
+        $filename = COMPILE_DIR . '/tpl_' . str_replace(DIRECTORY_SEPARATOR, '_ds_', $template);
         if ($layout) {
-            if (!$layoutFilename = $this->getLayoutFilename($layout)) {
-                return false;
-            }
-            $layoutLastModified = filemtime($layoutFilename);
-            $compileFilename .= "_layout_{$layout}_{$layoutLastModified}";
+            $filename .= '_layout_' . $layout;
         }
-        return "{$compileFilename}.php";
+        $filename .= '.php';
+        return $filename;
     }
 
     /**
@@ -156,13 +154,13 @@ class View {
      *
      * @param string $template template name
      */
-    public function clearCompiledTemplates($template = NULL) {
-        $compiledTplPattern = COMPILE_DIR . "/tpl_";
+    public function clearCompiledTemplate($template = NULL) {
+        $pattern = COMPILE_DIR . '/tpl_';
         if ($template) {
-            $compiledTplPattern .= str_replace('/', '_ds_', $template);
+            $pattern .= str_replace(DIRECTORY_SEPARATOR, '_ds_', $template);
         }
-        $compiledTplPattern .= '*.php';
-        foreach (glob($compiledTplPattern) as $filename) {
+        $pattern .= '*.php';
+        foreach (glob($pattern) as $filename) {
             unlink($filename);
         }
     }
@@ -179,23 +177,44 @@ class View {
         // Get compile filename
         $compileFilename = $this->getCompileFilename($template, $layout);
 
-        // Remove compile file if forceCompile == true
-        if (RenderPage::$forceCompile) {
-            if (file_exists($compileFilename)) {
-                unlink($compileFilename);
-            }
-        }
-
-        // [Compile]
-        if (!file_exists($compileFilename)) {
-            include_once RENDERPAGE_DIR . '/Compiler.php';
-            (new Compiler)->compile($this, $template, $layout);
+        // [ Compile ]
+        if (!$this->compileCheck($compileFilename)) {
+            require_once RENDERPAGE_DIR . '/Compiler.php';
+            (new Compiler($this))->compile($template, $layout, $compileFilename);
         }
 
         // Output
         ob_start();
         include $compileFilename;
         return ob_get_clean();
+    }
+
+    /**
+     * Check template for modifications
+     *
+     * @param string $filename
+     *
+     * @return boolean
+     */
+    private function compileCheck(string $filename): bool {
+        if (RenderPage::$forceCompile) {
+            return false;
+        }
+        if (!file_exists($filename)) {
+            return false;
+        }
+        $this->getFiles = true;
+        $files = include $filename;
+        $this->getFiles = false;
+        foreach ($files as $file) {
+            if (!file_exists($file['filename'])) {
+                return false;
+            }
+            if (filemtime($file['filename']) != $file['modified']) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

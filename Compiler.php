@@ -50,13 +50,22 @@ class Compiler {
      *
      * @var array
      */
-    public $classInst = [];
+    private $classInst = [];
+
+    /**
+     * Instance of View class
+     *
+     * @var object
+     */
+    private $view;
 
     /**
      * Init
+     *
+     * @param \renderpage\libs\View $view
      */
-    public function __construct() {
-        // none
+    public function __construct(View $view = NULL) {
+        $this->view = $view;
     }
 
     /**
@@ -108,6 +117,16 @@ class Compiler {
         // workarea
         if ($result['name'] == 'workarea') {
             $result['inc'] = $this->parse($this->files['template']['filename']);
+        }
+
+        // include
+        if ($result['name'] == 'include') {
+            $includeFilename = APP_DIR . '/' . $this->view->templateDir . '/' . $result['params'][0];
+            $this->files[] = [
+                'filename' => $includeFilename,
+                'modified' => filemtime($includeFilename)
+            ];
+            $result['inc'] = $this->parse($includeFilename);
         }
 
         // echo
@@ -202,7 +221,7 @@ class Compiler {
                         // Init class
                         if (!isset($this->classInst[$className])) {
                             $this->classInst[$className] = new $className;
-                            $this->classInst[$className]->compiler = &$this;
+                            $this->classInst[$className]->compiler = $this;
                         }
 
                         $this->classInst[$className]->filename = $foo['filename'];
@@ -236,57 +255,62 @@ class Compiler {
     /**
      * Compile
      *
-     * @param object $view instance of View class
      * @param string $template template name
      * @param string|boolean $layout layout template name
+     * @param string $compileFilename
      *
      * @return int
      */
-    public function compile($view, string $template, $layout): int {
+    public function compile(string $template, $layout, string $compileFilename): int {
         // Load instructions
         $this->instructions = require_once RENDERPAGE_DIR . '/compiler/instructions.php';
 
         // Remove old compile files
-        $view->clearCompiledTemplates($template);
+        $this->view->clearCompiledTemplate($template);
 
-        $templateFilename = $view->getTemplateFilename($template);
+        $templateFilename = $this->view->getTemplateFilename($template);
         if (!$templateFilename) {
             throw new CompilerException('Template "' . $template . '" not found');
         }
         $this->files['template'] = [
-            'filename' => $templateFilename
+            'filename' => $templateFilename,
+            'modified' => filemtime($templateFilename)
         ];
 
         if ($layout) {
-            $layoutFilename = $view->getLayoutFilename($layout);
+            $layoutFilename = $this->view->getLayoutFilename($layout);
             if (!$layoutFilename) {
                 throw new CompilerException('Layout "' . $layout . '" not found');
             }
             $this->files['layout'] = [
-                'filename' => $layoutFilename
+                'filename' => $layoutFilename,
+                'modified' => filemtime($layoutFilename)
             ];
-            $parseFilename = $this->files['layout']['filename'];
+            $parseFilename = &$layoutFilename;
         } else {
-            $parseFilename = $this->files['template']['filename'];
+            $parseFilename = &$templateFilename;
         }
 
         // Parse
         $parseTree = $this->parse($parseFilename);
 
         // Code generation
-        $data = $this->codeGeneration($parseTree);
+        $code = $this->codeGeneration($parseTree);
 
         // Add compile comment
         $data = '<?php /* RenderPage version: ' .
-                RenderPage::RENDERPAGE_VERSION . ', ' .
-                'created on ' . date('c') .
-                ' */ ?>' . $data;
+                RenderPage::RENDERPAGE_VERSION . ', created on ' .
+                date('c') . ' */' . PHP_EOL;
+
+        $data .= 'if ($this->getFiles) { return ' . var_export($this->files, true) . '; } ?>';
+
+        $data .= $code . PHP_EOL;
 
         // Code optimization
         $data = $this->optimization($data);
 
         // Write compile file
-        return $this->writeFile($view->getCompileFilename($template, $layout), $data);
+        return $this->writeFile($compileFilename, $data);
     }
 
     /**
@@ -308,7 +332,7 @@ class Compiler {
                 $strings[$code][$category][(string) $attributes->name] = (string) $child[0];
             }
 
-            $data = "<?php return " . var_export($strings, true) . ";";
+            $data = '<?php return ' . var_export($strings, true) . ';' . PHP_EOL;
 
             // Write compile file
             $this->writeFile($compileFilename, $data);
