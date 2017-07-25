@@ -41,7 +41,6 @@ class DB {
      */
     private function connect() {
         $conf = require APP_DIR . '/conf/db.php';
-
         try {
             $this->dbh = new \PDO($conf['dsn'], $conf['username'], $conf['password'], [\PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES {$conf['charset']}"]);
             $this->isConnected = true;
@@ -79,10 +78,7 @@ class DB {
      */
     public function getArray(string $sql, array $inputParameters = []) {
         $sth = $this->query($sql, $inputParameters);
-
-        $result = $sth->fetchAll();
-
-        return $result;
+        return $sth->fetchAll();
     }
 
     /**
@@ -95,10 +91,7 @@ class DB {
      */
     public function getRow(string $sql, array $inputParameters = []) {
         $sth = $this->query($sql, $inputParameters);
-
-        $result = $sth->fetch();
-
-        return $result;
+        return $sth->fetch();
     }
 
     /**
@@ -128,14 +121,10 @@ class DB {
      * @return int insert id
      */
     public function insert(string $into, array $data): int {
-        $into = str_replace('.', '`.`', $into);
-        $fields = implode('`, `', array_keys($data));
-        $values = implode(', ', array_fill(0, count($data), '?'));
-
-        $sql = "INSERT INTO `{$into}` (`{$fields}`) VALUES ({$values});";
-
+        $sql = 'INSERT INTO `' . str_replace('.', '`.`', $into) . '` (`';
+        $sql .= implode('`, `', array_keys($data)) . '`) VALUES (';
+        $sql .= implode(', ', array_fill(0, count($data), '?')) . ')';
         $this->query($sql, array_values($data));
-
         return $this->dbh->lastInsertId();
     }
 
@@ -145,10 +134,7 @@ class DB {
      * @param string $table table name
      */
     public function truncate(string $table) {
-        $table = str_replace('.', '`.`', $table);
-
-        $sql = "TRUNCATE TABLE `{$table}`";
-
+        $sql = 'TRUNCATE TABLE `' . str_replace('.', '`.`', $table) . '`';
         $this->query($sql);
     }
 
