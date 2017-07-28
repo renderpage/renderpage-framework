@@ -50,8 +50,10 @@ class Model {
      * @return mixed
      */
     public function __get(string $name) {
-        $method = "get{$name}";
-        return $this->{$method}();
+        $getter = 'get' . $name;
+        if (method_exists($this, $getter)) {
+            return $this->$getter();
+        }
     }
 
     /**
@@ -61,8 +63,10 @@ class Model {
      * @param mixed $value parameter passed to setter
      */
     public function __set(string $name, $value) {
-        $method = "set{$name}";
-        $this->{$method}($value);
+        $setter = 'set' . $name;
+        if (method_exists($this, $setter)) {
+            $this->$setter($value);
+        }
     }
 
     /**
