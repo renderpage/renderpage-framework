@@ -2,7 +2,7 @@
 
 /**
  * Project: RenderPage
- * File:    CompilerIf.php
+ * File:    IfTag.php
  *
  * @link    http://www.renderpage.org/
  * @author  Sergey Pershin <sergey dot pershin at hotmail dot com>
@@ -10,23 +10,19 @@
  * @version 1.0.0
  */
 
-namespace renderpage\libs\compiler;
+namespace renderpage\libs\compiler\tags;
 
-use renderpage\libs\CompilerException;
+use renderpage\libs\{
+    interfaces\CompilerTagInterface,
+    compiler\CompilerTag,
+    CompilerException
+};
 
 /**
  * This is CompilerIf class
  */
-class CompilerIf {
+class IfTag extends CompilerTag implements CompilerTagInterface {
 
-    /**
-     * Instance of Compiler class
-     *
-     * @var object
-     */
-    public $compiler;
-    public $filename;
-    public $line;
     private $comparisonOperators = [
         '==', // Equal
         '===', // Identical

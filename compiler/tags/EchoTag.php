@@ -2,7 +2,7 @@
 
 /**
  * Project: RenderPage
- * File:    CompilerEcho.php
+ * File:    EchoTag.php
  *
  * @link    http://www.renderpage.org/
  * @author  Sergey Pershin <sergey dot pershin at hotmail dot com>
@@ -10,19 +10,18 @@
  * @version 1.0.0
  */
 
-namespace renderpage\libs\compiler;
+namespace renderpage\libs\compiler\tags;
+
+use renderpage\libs\{
+    interfaces\CompilerTagInterface,
+    compiler\CompilerTag,
+    CompilerException
+};
 
 /**
- * This is CompilerEcho class
+ * This is EchoTag class
  */
-class CompilerEcho {
-
-    /**
-     * Instance of Compiler class
-     *
-     * @var object
-     */
-    public $compiler;
+class EchoTag extends CompilerTag implements CompilerTagInterface {
 
     /**
      * Echo
@@ -31,7 +30,7 @@ class CompilerEcho {
      *
      * @return string
      */
-    public function openTag($params) {
+    public function openTag(array $params): string {
         return '<?= ' . $this->compiler->getVariable($params[0]) . ' ?? \'\'; ?>';
     }
 
