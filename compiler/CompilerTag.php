@@ -1,17 +1,19 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Project: RenderPage
+ * File:    CompilerTag.php
+ *
+ * @link    http://www.renderpage.org/
+ * @author  Sergey Pershin <sergey dot pershin at hotmail dot com>
+ * @package RenderPage
+ * @version 1.0.0
  */
 
 namespace renderpage\libs\compiler;
 
 /**
- * Description of CompilerTag
- *
- * @author Sergey
+ * This is CompilerTag class
  */
 abstract class CompilerTag {
 

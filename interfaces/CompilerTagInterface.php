@@ -2,7 +2,7 @@
 
 /**
  * Project: RenderPage
- * File:    CompilerIf.php
+ * File:    CompilerTagInterface.php
  *
  * @link    http://www.renderpage.org/
  * @author  Sergey Pershin <sergey dot pershin at hotmail dot com>
