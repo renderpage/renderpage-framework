@@ -46,13 +46,6 @@ if (!defined('APP_DIR')) {
 }
 
 /**
- * Absolute path to compiled files.
- */
-if (!defined('COMPILE_DIR')) {
-    define('COMPILE_DIR', APP_DIR . '/compile');
-}
-
-/**
  * Load always needed external class files
  */
 require_once RENDERPAGE_DIR . '/traits/Singleton.php';
