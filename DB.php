@@ -56,12 +56,6 @@ class DB {
     public static $tablePrefix = '';
 
     /**
-     *
-     * @var array
-     */
-    private $cfg;
-
-    /**
      * Instance of PDO class
      *
      * @var object
@@ -76,9 +70,9 @@ class DB {
     private $isConnected = false;
 
     private function __construct() {
-        $this->cfg = include APP_DIR . '/conf/db.php';
-        if (isset($this->cfg['tablePrefix'])) {
-            self::$tablePrefix = $this->cfg['tablePrefix'];
+        $conf = include APP_DIR . '/conf/db.php';
+        if (isset($conf['tablePrefix'])) {
+            self::$tablePrefix = $conf['tablePrefix'];
         }
     }
 
@@ -171,7 +165,8 @@ class DB {
      */
     private function connect() {
         try {
-            $this->dbh = new PDO($this->cfg['dsn'], $this->cfg['username'], $this->cfg['password'], [PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES {$this->cfg['charset']}"]);
+            $conf = include APP_DIR . '/conf/db.php';
+            $this->dbh = new PDO($conf['dsn'], $conf['username'], $conf['password'], [PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES {$conf['charset']}"]);
             $this->isConnected = true;
         } catch (RenderPageException $e) {
             echo 'Unable to connect: ' . $e->getMessage();
