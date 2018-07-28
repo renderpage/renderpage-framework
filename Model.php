@@ -15,19 +15,19 @@ namespace renderpage\libs;
 /**
  * This is Model class
  */
-class Model {
+abstract class Model {
 
     /**
      * Instance of Language class
      *
-     * @var object
+     * @var \renderpage\libs\Language
      */
     public $language;
 
     /**
      * Instance of DB class
      *
-     * @var object
+     * @var \renderpage\libs\DB
      */
     public $db;
 

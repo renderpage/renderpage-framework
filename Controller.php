@@ -13,28 +13,28 @@
 namespace renderpage\libs;
 
 /**
- * This is Controller class
+ * This is Controller class.
  */
-class Controller {
+abstract class Controller {
 
     /**
      * Instance of Request class
      *
-     * @var object
+     * @var \renderpage\libs\Request
      */
     protected $request;
 
     /**
      * Instance of Language class
      *
-     * @var object
+     * @var \renderpage\libs\Language
      */
     protected $language;
 
     /**
      * Instance of View class
      *
-     * @var object
+     * @var \renderpage\libs\View
      */
     protected $view;
 

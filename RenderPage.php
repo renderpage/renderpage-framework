@@ -56,21 +56,21 @@ class RenderPage {
     /**
      * Instance of Request class
      *
-     * @var object
+     * @var \renderpage\libs\Request
      */
     public $request;
 
     /**
      * Instance of Language class
      *
-     * @var object
+     * @var \renderpage\libs\Language
      */
     public $language;
 
     /**
      * Route instance
      *
-     * @var object
+     * @var \renderpage\libs\Route
      */
     private $route;
 
