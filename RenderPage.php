@@ -77,13 +77,6 @@ class RenderPage {
     const RENDERPAGE_VERSION = '1.0.0a';
 
     /**
-     * Recompile every time
-     *
-     * @var boolean
-     */
-    public static $forceCompile = false;
-
-    /**
      * Charset
      *
      * @var string
@@ -129,11 +122,6 @@ class RenderPage {
      * Init
      */
     public function __construct() {
-        // Debug mode
-        if (RENDERPAGE_DEBUG) {
-            self::$forceCompile = true;
-        }
-
         // Create instance of Request class
         $this->request = Request::getInstance();
 
@@ -182,7 +170,9 @@ class RenderPage {
     public function output() {
         if ($this->outputData === false) {
             header('Content-Type: text/html; charset=' . self::$charset, true, 404);
-            echo (new View)->setVar('title', '404')->render('404', 'error');
+            $view = new View;
+            $view->title = '404';
+            echo $view->render('404', 'error');
         } elseif (is_array($this->outputData)) {
             header('Content-Type: application/json');
             echo json_encode($this->outputData);

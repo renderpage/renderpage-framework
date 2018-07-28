@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-us">
   <head>
     <meta charset="<?= renderpage\libs\RenderPage::$charset ?>">
     <title>Exception</title>

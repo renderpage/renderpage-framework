@@ -1,5 +1,29 @@
 <?php
 
+/*
+ * The MIT License
+ *
+ * Copyright 2018 Sergey Pershin <sergey dot pershin at hotmail dot com>.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 /**
  * Project: RenderPage
  * File:    View.php
@@ -12,24 +36,15 @@
 
 namespace renderpage\libs;
 
+use renderpage\libs\exceptions\ViewException;
+
 /**
- * This is View class
+ * Template engine
  */
 class View {
 
-    /**
-     * Template directory
-     *
-     * @var string
-     */
-    public $templateDir = 'templates';
-
-    /**
-     * Template extension
-     *
-     * @var string
-     */
-    public $extension = '.tpl';
+    const SCOPE_LAYOUT = 'layout';
+    const SCOPE_TEMPLATE = 'template';
 
     /**
      * Instance of Language class
@@ -39,21 +54,60 @@ class View {
     public $language;
 
     /**
+     * Template JavaScript files
+     *
+     * @var array
+     */
+    public $scripts = [];
+
+    /**
+     * Template CSS files
+     *
+     * @var array
+     */
+    public $styles = [];
+
+    /**
+     * Template directory
+     *
+     * @var string
+     */
+    public $templateDir = APP_DIR . DIRECTORY_SEPARATOR . 'templates';
+
+    /**
+     * Tag title
+     *
+     * @var string
+     */
+    public $title = '';
+
+    /**
+     * The main content
+     *
+     * @var string
+     */
+    public $workarea = '';
+
+    /**
      * Template variables
      *
      * @var array
      */
     private $variables = [
-        'cssFiles' => [],
-        'jsFiles' => []
+        self::SCOPE_LAYOUT => [],
+        self::SCOPE_TEMPLATE => []
     ];
 
     /**
-     * Used for check templates
+     * Using in fetch
      *
-     * @var boolean
+     * @var string
      */
-    private $getFiles = false;
+    private $filename = '';
+
+    public function _(string $category, string $str): string {
+        return Language::getInstance()->_($category, $str);
+    }
 
     /**
      * Init
@@ -64,157 +118,84 @@ class View {
     }
 
     /**
-     * Add variable to template
+     * Adds script file the layout
      *
-     * @param string $name var name
-     * @param mixed $value value var
-     */
-    public function setVar(string $name, $value) {
-        $this->variables[$name] = $value;
-        return $this;
-    }
-
-    /**
-     * Add css file to template
+     * @param string $src The JavaScript file.
      *
-     * @param string $href css file
-     */
-    public function addCss(string $href) {
-        $this->variables['cssFiles'][] = ['href' => $href];
-        return $this;
-    }
-
-    /**
-     * Add script file to template
-     *
-     * @param string $src js file
+     * @return \renderpage\libs\View
      */
     public function addScript(string $src) {
-        $this->variables['jsFiles'][] = ['src' => $src];
+        $this->scripts[] = ['src' => $src];
         return $this;
     }
 
     /**
-     * Get template filename
+     * Adds CSS file to the layout
      *
-     * @param string $template template name
+     * @param string $href The CSS file.
      *
-     * @return string|boolean
+     * @return \renderpage\libs\View
      */
-    public function getTemplateFilename(string $template) {
-        $filename = APP_DIR . "/{$this->templateDir}/{$template}{$this->extension}";
-        if (file_exists($filename)) {
-            return $filename;
-        }
-        $filename = RENDERPAGE_DIR . "/templates/{$template}{$this->extension}";
-        if (file_exists($filename)) {
-            return $filename;
-        }
-        return false;
+    public function addStyle(string $href) {
+        $this->styles[] = ['href' => $href];
+        return $this;
     }
 
     /**
-     * Get layout filename
+     * Assigns variables to the templates
      *
-     * @param string $layout layout name
+     * @param string $name The name of the variable being assigned.
+     * @param mixed $value The value being assigned.
+     * @param string $scope The scope of the assigned variable: 'layout' or 'template'
      *
-     * @return string|boolean
+     * @return \renderpage\libs\View
+     *
+     * @throws ViewException
      */
-    public function getLayoutFilename(string $layout) {
-        $filename = APP_DIR . "/{$this->templateDir}/layouts/{$layout}{$this->extension}";
-        if (file_exists($filename)) {
-            return $filename;
+    public function assign(string $name, $value, $scope = self::SCOPE_TEMPLATE): View {
+        if (self::SCOPE_LAYOUT !== $scope && self::SCOPE_TEMPLATE !== $scope) {
+            throw new ViewException('$scope is invalid');
         }
-        $filename = RENDERPAGE_DIR . "/{$this->templateDir}/layouts/{$layout}{$this->extension}";
-        if (file_exists($filename)) {
-            return $filename;
-        }
-        return false;
+        $this->variables[$scope][$name] = $value;
+        return $this;
     }
 
     /**
-     * Get compile filename
+     * Returns the template output
      *
-     * @param string $template template name
-     * @param string|boolean $layout layout template name
+     * @param string $template The name of the template file.
+     * @param string $scope The scope of the assigned variable: 'layout' or 'template'
      *
-     * @return string Filename
+     * @return string
+     *
+     * @throws ViewException
      */
-    public function getCompileFilename(string $template, $layout): string {
-        $filename = COMPILE_DIR . '/tpl_' . str_replace(DIRECTORY_SEPARATOR, '_ds_', $template);
-        if ($layout) {
-            $filename .= '_layout_' . $layout;
+    public function fetch(string $template, string $scope = self::SCOPE_TEMPLATE): string {
+        $this->filename = $this->templateDir . DIRECTORY_SEPARATOR . $template . '.php';
+        if (!is_file($this->filename)) {
+            $this->filename = RENDERPAGE_DIR . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . $template . '.php';
         }
-        $filename .= '.php';
-        return $filename;
-    }
-
-    /**
-     * Clears compiled template files or file
-     *
-     * @param string $template template name
-     */
-    public function clearCompiledTemplate($template = NULL) {
-        $pattern = COMPILE_DIR . '/tpl_';
-        if ($template) {
-            $pattern .= str_replace(DIRECTORY_SEPARATOR, '_ds_', $template);
+        if (!is_file($this->filename)) {
+            throw new ViewException('fetch(' . $this->filename . ') failed to open: No such file');
         }
-        $pattern .= '*.php';
-        foreach (glob($pattern) as $filename) {
-            unlink($filename);
-        }
+        unset($template);
+        extract($this->variables[$scope], EXTR_REFS);
+        ob_start();
+        include $this->filename;
+        return ob_get_clean();
     }
 
     /**
      * Render template
      *
-     * @param string $template template name
-     * @param string|boolean $layout layout template name
+     * @param string $template The name of the template file.
+     * @param string $layout The name of the layout file.
      *
-     * @return mixed
+     * @return string
      */
-    public function render(string $template, $layout = 'default') {
-        // Get compile filename
-        $compileFilename = $this->getCompileFilename($template, $layout);
-
-        // [ Compile ]
-        if (!$this->compileCheck($compileFilename)) {
-            require_once RENDERPAGE_DIR . '/Compiler.php';
-            (new Compiler($this))->compile($template, $layout, $compileFilename);
-        }
-
-        // Output
-        ob_start();
-        include $compileFilename;
-        return ob_get_clean();
-    }
-
-    /**
-     * Check template for modifications
-     *
-     * @param string $filename
-     *
-     * @return boolean
-     */
-    private function compileCheck(string $filename): bool {
-        if (RenderPage::$forceCompile) {
-            return false;
-        }
-        if (!file_exists($filename)) {
-            return false;
-        }
-        $this->getFiles = true;
-        $files = include $filename;
-        $this->getFiles = false;
-        foreach ($files as $file) {
-            if (!file_exists($file['filename'])) {
-                return false;
-            }
-            if (filemtime($file['filename']) != $file['modified']) {
-                return false;
-            }
-        }
-        return true;
+    public function render(string $template, $layout = 'default'): string {
+        $this->workarea = $this->fetch($template);
+        return $this->fetch('layouts' . DIRECTORY_SEPARATOR . $layout, self::SCOPE_LAYOUT);
     }
 
 }
