@@ -36,6 +36,8 @@
 
 namespace renderpage\libs;
 
+use Exception;
+
 /**
  * The Request class (HTTP request).
  *
@@ -65,6 +67,22 @@ final class Request {
         if (method_exists($this, $methodName)) {
             return $this->{$methodName}();
         }
+    }
+
+    /**
+     * Setter
+     *
+     * @param string $name The property name.
+     * @param mixed $value The property value.
+     *
+     * @throws Exception
+     */
+    public function __set(string $name, $value) {
+        $methodName = 'get' . ucfirst($name);
+        if (method_exists($this, $methodName)) {
+            throw new Exception('Cannot assign to read only property \'' . $name . '\' of object \'' . __CLASS__ . '\'.');
+        }
+        $this->$name = $value;
     }
 
     /**
