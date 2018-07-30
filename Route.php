@@ -42,46 +42,14 @@ namespace renderpage\libs;
 class Route {
 
     /**
-     * Controller directory
-     *
-     * @var string
-     */
-    public $controllerDir = 'controllers';
-
-    /**
-     * URL path
-     *
-     * @var string
-     */
-    public $urlPath;
-
-    /**
-     * Route rules
-     *
-     * @var array
-     */
-    public $routeRules = ['/^\/$/' => []];
-
-    /**
      * Default controller name
-     *
-     * @var string
      */
-    public $defaultControllerName = 'DefaultController';
+    const DEFAULT_CONTROLLER_NAME = 'DefaultController';
 
     /**
      * Default action name
-     *
-     * @var string
      */
-    public $defaultActionName = 'actionIndex';
-
-    /**
-     * Controller name
-     *
-     * @var string
-     */
-    public $controllerName = '';
+    const DEFAULT_ACTION_NAME = 'actionIndex';
 
     /**
      * Action name
@@ -89,6 +57,20 @@ class Route {
      * @var string
      */
     public $actionName = '';
+
+    /**
+     * Controller directory
+     *
+     * @var string
+     */
+    public $controllerDir = 'controllers';
+
+    /**
+     * Controller name
+     *
+     * @var string
+     */
+    public $controllerName = '';
 
     /**
      * Language name
@@ -105,21 +87,29 @@ class Route {
     public $params = [];
 
     /**
+     * Route rules
+     *
+     * @var array
+     */
+    public $routeRules = ['/^\/$/' => [],
+        '/^\/(?<controller>[\w-]+)$/' => [],
+        '/^\/(?<controller>[\w-]+)\/(?<action>[\w-]+)$/' => [],
+        '/^\/(?<action>[\w-]+)$/' => []
+    ];
+
+    /**
+     * URL path
+     *
+     * @var string
+     */
+    public $urlPath;
+
+    /**
      * Init
      */
     public function __construct() {
         // Get url path
         $this->urlPath = Request::getInstance()->getUrlPath();
-    }
-
-    /**
-     * Add route rule
-     *
-     * @param string $pattern
-     * @param string $params
-     */
-    public function addRouteRule($pattern, $params = []) {
-        $this->routeRules[$pattern] = $params;
     }
 
     /**
@@ -161,7 +151,9 @@ class Route {
      * @return boolean
      */
     public function run() {
-        $this->routeRules = include APP_DIR . '/conf/route.php';
+        if (file_exists(APP_DIR . '/conf/route.php')) {
+            $this->routeRules = include APP_DIR . '/conf/route.php';
+        }
 
         foreach ($this->routeRules as $pattern => $params) {
             if (preg_match($pattern, $this->urlPath, $matches)) {
@@ -172,7 +164,7 @@ class Route {
                     if (!empty($params['controller'])) {
                         $controllerName = $this->getControllerName($params['controller']);
                     } else {
-                        $controllerName = $this->defaultControllerName;
+                        $controllerName = self::DEFAULT_CONTROLLER_NAME;
                     }
                 }
 
@@ -184,7 +176,7 @@ class Route {
                     if (!empty($params['action'])) {
                         $actionName = $this->getActionName($params['action']);
                     } else {
-                        $actionName = $this->defaultActionName;
+                        $actionName = self::DEFAULT_ACTION_NAME;
                     }
                 }
 
