@@ -106,7 +106,7 @@ class View {
     private $filename = '';
 
     public function _(string $category, string $str): string {
-        return Language::getInstance()->_($category, $str);
+        return Language::getInstance()->getText($category, $str);
     }
 
     /**

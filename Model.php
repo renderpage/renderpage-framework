@@ -67,42 +67,31 @@ abstract class Model {
     }
 
     /**
-     * <<magic>> Getter.
+     * Getter
      *
-     * @param string $name property name
+     * @param string $name The property name.
      *
      * @return mixed
      */
     public function __get(string $name) {
-        $getter = 'get' . $name;
-        if (method_exists($this, $getter)) {
-            return $this->$getter();
+        $methodName = 'get' . ucfirst($name);
+        if (method_exists($this, $methodName)) {
+            return $this->{$methodName}();
         }
     }
 
     /**
-     * <<magic>> Setter.
+     * Setter
      *
-     * @param string $name property name
-     * @param mixed $value parameter passed to setter
+     * @param string $name The property name.
+     * @param mixed $value The property value.
      */
     public function __set(string $name, $value) {
-        $setter = 'set' . $name;
-        if (method_exists($this, $setter)) {
-            $this->$setter($value);
+        $methodName = 'set' . ucfirst($name);
+        if (method_exists($this, $methodName)) {
+            $this->{$methodName}($value);
         }
-    }
-
-    /**
-     * Allias for $this->language->_($category, $str)
-     *
-     * @param string $category
-     * @param string $str
-     *
-     * @return string
-     */
-    public function _(string $category, string $str) {
-        return $this->language->_($category, $str);
+        $this->$name = $value;
     }
 
 }

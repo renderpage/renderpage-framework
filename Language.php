@@ -68,7 +68,7 @@ class Language {
      *
      * @return string
      */
-    public function _(string $category, string $str): string {
+    public function getText(string $category, string $str): string {
         if (empty($this->strings[$this->code][$category])) {
             $this->loadCategory($category);
         }
