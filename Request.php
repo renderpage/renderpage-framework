@@ -137,7 +137,7 @@ final class Request {
      *
      * @return string
      */
-    public function getUrlPath() {
+    public function getUrlPath(): string {
         // Remove query
         $urlPath = current(explode('?', $this->uri));
 
