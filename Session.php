@@ -52,7 +52,50 @@ class Session {
     const DEFAULT_SESSION_NAME = 'SESSID';
 
     /**
-     * Init
+     * Gets a the session variable value.
+     *
+     * @param string $key The session variable name.
+     *
+     * @return mixed The session variable value, or <b>FALSE</b> if the session variable does not exist.
+     */
+    public function get(string $key) {
+        $value = false;
+        $this->start();
+
+        if (isset($_SESSION[$key])) {
+            $value = $_SESSION[$key];
+        }
+
+        return $value;
+    }
+
+    /**
+     * Removes a session variable.
+     *
+     * @param string $key The name of the session variable to be removed.
+     *
+     * @return void
+     */
+    public function remove(string $key) {
+        $this->start();
+        unset($_SESSION[$key]);
+    }
+
+    /**
+     * Sets a session variable.
+     *
+     * @param string $key Session variable name.
+     * @param mixed $value Session variable value.
+     *
+     * @return void
+     */
+    public function set(string $key, $value) {
+        $this->start();
+        $_SESSION[$key] = $value;
+    }
+
+    /**
+     * Start new or resume existing session.
      */
     public function start() {
         if (file_exists(APP_DIR . '/conf/session.php')) {
@@ -72,50 +115,6 @@ class Session {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-    }
-
-    /**
-     * Get a variable from the session array.
-     *
-     * @param string $name variable name
-     *
-     * @return mixed
-     */
-    public function get(string $name) {
-        $this->start();
-
-        if (isset($_SESSION[$name])) {
-            return $_SESSION[$name];
-        }
-
-        return NULL;
-    }
-
-    /**
-     * Set a variable in the session array.
-     *
-     * @param string $name variable name
-     * @param mixed $value value
-     *
-     * @return void
-     */
-    public function set(string $name, $value) {
-        $this->start();
-
-        $_SESSION[$name] = $value;
-    }
-
-    /**
-     * Unset a variable in the session array.
-     *
-     * @param string $name variable name
-     *
-     * @return void
-     */
-    public function del(string $name) {
-        $this->start();
-
-        unset($_SESSION[$name]);
     }
 
 }
