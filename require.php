@@ -49,7 +49,6 @@ if (!defined('APP_DIR')) {
  * Load always needed external class files
  */
 require_once RENDERPAGE_DIR . '/traits/Singleton.php';
-require_once RENDERPAGE_DIR . '/RenderPageException.php';
 require_once RENDERPAGE_DIR . '/Request.php';
 require_once RENDERPAGE_DIR . '/Route.php';
 require_once RENDERPAGE_DIR . '/Session.php';
@@ -63,8 +62,8 @@ require_once RENDERPAGE_DIR . '/Controller.php';
  * Autoloader
  */
 spl_autoload_register(function ($class) {
-    if (0 === strpos($class, 'renderpage\lib')) {
-        $filename = RENDERPAGE_DIR . DIRECTORY_SEPARATOR . substr(strtr($class, '\\', DIRECTORY_SEPARATOR), strlen('renderpage\lib') + 1) . '.php';
+    if (0 === strpos($class, 'renderpage\libs\\')) {
+        $filename = RENDERPAGE_DIR . DIRECTORY_SEPARATOR . substr(strtr($class, '\\', DIRECTORY_SEPARATOR), strlen('renderpage\libs\\')) . '.php';
     } else {
         $filename = dirname(APP_DIR) . DIRECTORY_SEPARATOR . strtr($class, '\\', DIRECTORY_SEPARATOR) . '.php';
     }
@@ -74,5 +73,5 @@ spl_autoload_register(function ($class) {
 /**
  * Errors
  */
-set_exception_handler(['\renderpage\libs\RenderPageException', 'exceptionHandler']);
-set_error_handler(['\renderpage\libs\RenderPageException', 'errorHandler']);
+set_exception_handler(['\renderpage\libs\exceptions\RenderPageException', 'exceptionHandler']);
+set_error_handler(['\renderpage\libs\exceptions\RenderPageException', 'errorHandler']);

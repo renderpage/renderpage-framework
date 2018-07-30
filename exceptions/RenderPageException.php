@@ -10,10 +10,11 @@
  * @version 1.0.0
  */
 
-namespace renderpage\libs;
+namespace renderpage\libs\exceptions;
 
-use Exception;
-use ErrorException;
+use Exception,
+    ErrorException,
+    renderpage\libs\RenderPage;
 
 /**
  * This is RenderPageException class
@@ -67,7 +68,7 @@ class RenderPageException extends ErrorException {
         }
 
         // Show
-        include __DIR__ . '/templates/exception.php';
+        include RENDERPAGE_DIR . '/templates/exception.php';
     }
 
     /**
