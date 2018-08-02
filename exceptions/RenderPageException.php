@@ -14,7 +14,8 @@ namespace renderpage\libs\exceptions;
 
 use Exception,
     ErrorException,
-    renderpage\libs\RenderPage;
+    renderpage\libs\RenderPage,
+    renderpage\libs\View;
 
 /**
  * This is RenderPageException class
@@ -47,12 +48,9 @@ class RenderPageException extends ErrorException {
         header('Content-Type: text/html; charset=' . RenderPage::$charset, true, 500);
 
         // Get information
-        $class = get_class($e);
-        $code = $e->getCode();
         $message = $e->getMessage();
         $file = $e->getFile();
         $line = $e->getLine();
-        $trace = $e->getTrace();
         $source = self::source($file, $line);
 
         // Write to file
@@ -67,8 +65,16 @@ class RenderPageException extends ErrorException {
             }
         }
 
-        // Show
-        include RENDERPAGE_DIR . '/templates/exception.php';
+        $view = new View;
+        $view->title = '500';
+        $view->assign('e', $e);
+        $view->assign('source', $source);
+
+        if (RENDERPAGE_DEBUG) {
+            echo $view->render('debug-500', 'debug');
+        } else {
+            echo $view->render('500', 'error');
+        }
     }
 
     /**
