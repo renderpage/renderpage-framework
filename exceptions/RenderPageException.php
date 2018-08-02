@@ -70,6 +70,8 @@ class RenderPageException extends ErrorException {
         $view->assign('e', $e);
         $view->assign('source', $source);
 
+        ob_clean();
+
         if (RENDERPAGE_DEBUG) {
             echo $view->render('debug-500', 'debug');
         } else {
