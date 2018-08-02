@@ -54,13 +54,6 @@ class RenderPage {
     public static $charset = 'UTF-8';
 
     /**
-     * Instance of Request class
-     *
-     * @var \renderpage\libs\Request
-     */
-    public $request;
-
-    /**
      * Instance of Language class
      *
      * @var \renderpage\libs\Language
@@ -68,11 +61,18 @@ class RenderPage {
     public $language;
 
     /**
-     * Route instance
+     * Instance of Request class
      *
-     * @var \renderpage\libs\Route
+     * @var \renderpage\libs\Request
      */
-    private $route;
+    public $request;
+
+    /**
+     * Instance of Response class
+     *
+     * @var \renderpage\libs\Response
+     */
+    public $response;
 
     /**
      * Instance of active controller
@@ -82,11 +82,11 @@ class RenderPage {
     private $controller;
 
     /**
-     * Output
+     * Route instance
      *
-     * @var mixed
+     * @var \renderpage\libs\Route
      */
-    public $outputData = false;
+    private $route;
 
     /**
      * Init
@@ -95,8 +95,31 @@ class RenderPage {
         // Create instance of Request class
         $this->request = Request::getInstance();
 
+        // Create instance of Request class
+        $this->response = Response::getInstance();
+
         // Create instance of Language class
         $this->language = Language::getInstance();
+    }
+
+    /**
+     * Application execute
+     *
+     * @return \renderpage\libs\RenderPage
+     */
+    public function execute(): RenderPage {
+        if (!empty($this->controller)) {
+            // Before action
+            $this->controller->before();
+
+            // Action run
+            $this->response->data = $this->controller->{$this->route->actionName}($this->route->params);
+
+            // After action
+            $this->controller->after();
+        }
+
+        return $this;
     }
 
     /**
@@ -117,41 +140,16 @@ class RenderPage {
     }
 
     /**
-     * Application execute
-     *
-     * @return \renderpage\libs\RenderPage
-     */
-    public function execute(): RenderPage {
-        if (!empty($this->controller)) {
-            // Before action
-            $this->controller->before();
-
-            // Action run
-            $this->outputData = $this->controller->{$this->route->actionName}($this->route->params);
-
-            // After action
-            $this->controller->after();
-        }
-
-        return $this;
-    }
-
-    /**
      * Outputting data
      */
-    public function output() {
-        if (false === $this->outputData) {
-            header('Content-Type: text/html; charset=' . self::$charset, true, 404);
+    public function send() {
+        if (false === $this->response->data) {
             $view = new View;
             $view->title = '404';
-            echo $view->render('404', 'error');
-        } elseif (is_array($this->outputData)) {
-            header('Content-Type: application/json; charset=UTF-8');
-            echo json_encode($this->outputData);
-        } else {
-            header('Content-Type: text/html; charset=' . self::$charset);
-            echo $this->outputData;
+            $this->response->code = 404;
+            $this->response->content = $view->render('404', 'error');
         }
+        $this->response->send();
     }
 
 }

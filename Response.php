@@ -24,80 +24,66 @@
  * THE SOFTWARE.
  */
 
-/**
- * Project: RenderPage
- * File:    Controller.php
- *
- * @link    http://www.renderpage.org/
- * @author  Sergey Pershin <sergey dot pershin at hotmail dot com>
- * @package RenderPage
- * @version 1.0.0
- */
-
 namespace renderpage\libs;
 
 /**
- * This is Controller class.
+ * The Response class (HTTP response).
+ *
+ * @author Sergey Pershin <sergey dot pershin at hotmail dot com>
  */
-abstract class Controller {
+final class Response {
 
     /**
-     * Instance of Language class
+     * Singleton trait
+     */
+    use traits\Singleton;
+
+    /**
+     * The HTTP response code.
      *
-     * @var \renderpage\libs\Language
+     * @var int
      */
-    public $language;
+    public $code = 200;
 
     /**
-     * Instance of Request class
+     * The response content.
      *
-     * @var \renderpage\libs\Request
+     * @var string
      */
-    public $request;
+    public $content = '';
 
     /**
-     * Instance of Response class
+     * The original response data.
      *
-     * @var \renderpage\libs\Response
+     * @var string|array|object|bool
      */
-    public $response;
+    public $data = false;
 
     /**
-     * Instance of View class
+     * Redirect to the specified URL.
      *
-     * @var \renderpage\libs\View
+     * @param string $location The URL.
+     * @param int $httpResponseCode The response code.
+     *
+     * @return string
      */
-    public $view;
-
-    /**
-     * Init
-     */
-    public function __construct() {
-        // Create instance of Request class
-        $this->request = Request::getInstance();
-
-        // Create instance of Request class
-        $this->response = Response::getInstance();
-
-        // Create instance of Language class
-        $this->language = Language::getInstance();
-
-        // Create instance of View class
-        $this->view = new View;
+    public function redirect(string $location, int $httpResponseCode = 302) {
+        $this->code = $httpResponseCode;
+        header('Location: ' . $location);
     }
 
     /**
-     * Before action
+     * Sends the response to the client.
      */
-    public function before() {
-        // none
-    }
-
-    /**
-     * After action
-     */
-    public function after() {
-        // none
+    public function send() {
+        if (is_string($this->data)) {
+            $this->content = $this->data;
+        } elseif (is_array($this->data) || is_object($this->data)) {
+            header('Content-Type: application/json; charset=UTF-8');
+            $this->content = json_encode($this->data);
+        }
+        http_response_code($this->code);
+        echo $this->content;
     }
 
 }
