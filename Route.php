@@ -91,7 +91,8 @@ class Route {
      *
      * @var array
      */
-    public $routeRules = ['/^\/$/' => [],
+    public $routeRules = [
+        '/^\/$/' => [],
         '/^\/(?<controller>[\w-]+)$/' => [],
         '/^\/(?<controller>[\w-]+)\/(?<action>[\w-]+)$/' => [],
         '/^\/(?<action>[\w-]+)$/' => []
@@ -102,29 +103,62 @@ class Route {
      *
      * @var string
      */
-    public $urlPath;
+    public $urlPath = '';
 
     /**
      * Init
      */
     public function __construct() {
-        // Get url path
+        // Get URL path
         $this->urlPath = Request::getInstance()->getUrlPath();
     }
 
     /**
-     * Get controller name
+     * Run route
      *
-     * @param string $str
-     *
-     * @return string
+     * @return boolean
      */
-    private function getControllerName($str) {
-        return str_replace(' ', '', ucwords(str_replace('-', ' ', $str))) . 'Controller';
+    public function run(): bool {
+        $ok = false;
+
+        if (file_exists(APP_DIR . '/conf/route.php')) {
+            $this->routeRules = include APP_DIR . '/conf/route.php';
+        }
+
+        foreach ($this->routeRules as $pattern => $params) {
+            if ($this->matches($pattern, $params)) {
+                $ok = true;
+                break;
+            }
+        }
+
+        return $ok;
     }
 
     /**
-     * Get controller filename
+     * Gets action name
+     *
+     * @param array $matches
+     * @param array $params
+     *
+     * @return string
+     */
+    private function getActionName(array $matches, array $params): string {
+        $action = false;
+
+        if (!empty($matches['action'])) {
+            $action = $matches['action'];
+        } elseif (!empty($params['action'])) {
+            $action = $params['action'];
+        }
+
+        return $action ?
+                'action' . str_replace(' ', '', ucwords(str_replace('-', ' ', $action))) :
+                self::DEFAULT_ACTION_NAME;
+    }
+
+    /**
+     * Gets controller filename
      *
      * @param string $controllerName
      *
@@ -135,68 +169,55 @@ class Route {
     }
 
     /**
-     * Get action name
+     * Gets controller name
      *
-     * @param string $str
+     * @param array $matches
+     * @param array $params
      *
      * @return string
      */
-    private function getActionName($str) {
-        return 'action' . str_replace(' ', '', ucwords(str_replace('-', ' ', $str)));
+    private function getControllerName(array $matches, array $params): string {
+        $controller = false;
+
+        if (!empty($matches['controller'])) {
+            $controller = $matches['controller'];
+        } elseif (!empty($params['controller'])) {
+            $controller = $params['controller'];
+        }
+
+        return $controller ?
+                str_replace(' ', '', ucwords(str_replace('-', ' ', $controller))) . 'Controller' :
+                self::DEFAULT_CONTROLLER_NAME;
     }
 
     /**
-     * Run route
+     * Tests if the route matches
+     *
+     * @param string $pattern
+     * @param array $params
      *
      * @return boolean
      */
-    public function run() {
-        if (file_exists(APP_DIR . '/conf/route.php')) {
-            $this->routeRules = include APP_DIR . '/conf/route.php';
-        }
+    private function matches(string $pattern, array $params): bool {
+        $ok = false;
+        $matches = [];
 
-        foreach ($this->routeRules as $pattern => $params) {
-            if (preg_match($pattern, $this->urlPath, $matches)) {
+        if (1 === preg_match($pattern, $this->urlPath, $matches)) {
+            $controllerName = $this->getControllerName($matches, $params);
+            $controllerFilename = $this->getControllerFilename($controllerName);
+            $actionName = $this->getActionName($matches, $params);
 
-                if (!empty($matches['controller'])) {
-                    $controllerName = $this->getControllerName($matches['controller']);
-                } else {
-                    if (!empty($params['controller'])) {
-                        $controllerName = $this->getControllerName($params['controller']);
-                    } else {
-                        $controllerName = self::DEFAULT_CONTROLLER_NAME;
-                    }
-                }
+            if (file_exists($controllerFilename) && method_exists('\app\controllers\\' . $controllerName, $actionName)) {
+                $this->controllerName = $controllerName;
+                $this->actionName = $actionName;
+                $this->params = $matches;
+                $this->language = !empty($matches['language']) ? $matches['language'] : $this->language;
 
-                $controllerFilename = $this->getControllerFilename($controllerName);
-
-                if (!empty($matches['action'])) {
-                    $actionName = $this->getActionName($matches['action']);
-                } else {
-                    if (!empty($params['action'])) {
-                        $actionName = $this->getActionName($params['action']);
-                    } else {
-                        $actionName = self::DEFAULT_ACTION_NAME;
-                    }
-                }
-
-                if (file_exists($controllerFilename)) {
-                    include_once $controllerFilename;
-
-                    if (method_exists('\app\controllers\\' . $controllerName, $actionName)) {
-                        $this->controllerName = $controllerName;
-                        $this->actionName = $actionName;
-                        $this->params = $matches;
-                        if (!empty($matches['language'])) {
-                            $this->language = $matches['language'];
-                        }
-                        return true;
-                    }
-                }
+                $ok = true;
             }
         }
 
-        return false;
+        return $ok;
     }
 
 }
