@@ -3,7 +3,7 @@
 /*
  * The MIT License
  *
- * Copyright 2018 Sergey Pershin <sergey dot pershin at hotmail dot com>.
+ * Copyright (c) 2015-2019 Sergey Pershin
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ if (!defined('RENDERPAGE_DIR')) {
  * Absolute path to application files.
  */
 if (!defined('APP_DIR')) {
-    define('APP_DIR', dirname(__DIR__) . '/app');
+    define('APP_DIR', __DIR__ . '/../../../app');
 }
 
 /**
@@ -62,8 +62,8 @@ require_once RENDERPAGE_DIR . '/Controller.php';
  * Autoloader
  */
 spl_autoload_register(function ($class) {
-    if (0 === strpos($class, 'renderpage\libs\\')) {
-        $filename = RENDERPAGE_DIR . DIRECTORY_SEPARATOR . substr(strtr($class, '\\', DIRECTORY_SEPARATOR), strlen('renderpage\libs\\')) . '.php';
+    if (0 === strpos($class, 'vendor\pershin\renderpage\\')) {
+        $filename = RENDERPAGE_DIR . DIRECTORY_SEPARATOR . substr(strtr($class, '\\', DIRECTORY_SEPARATOR), strlen('vendor\pershin\renderpage\\')) . '.php';
     } else {
         $filename = dirname(APP_DIR) . DIRECTORY_SEPARATOR . strtr($class, '\\', DIRECTORY_SEPARATOR) . '.php';
     }
@@ -73,5 +73,5 @@ spl_autoload_register(function ($class) {
 /**
  * Errors
  */
-set_exception_handler(['\renderpage\libs\exceptions\RenderPageException', 'exceptionHandler']);
-set_error_handler(['\renderpage\libs\exceptions\RenderPageException', 'errorHandler']);
+set_exception_handler(['\vendor\pershin\renderpage\exceptions\RenderPageException', 'exceptionHandler']);
+set_error_handler(['\vendor\pershin\renderpage\exceptions\RenderPageException', 'errorHandler']);
