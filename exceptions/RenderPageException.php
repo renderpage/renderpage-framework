@@ -38,8 +38,8 @@ namespace vendor\pershin\renderpage\exceptions;
 
 use Exception,
     ErrorException,
-    renderpage\libs\RenderPage,
-    renderpage\libs\View;
+    vendor\pershin\renderpage\RenderPage,
+    vendor\pershin\renderpage\View;
 
 /**
  * This is RenderPageException class
