@@ -3,7 +3,7 @@
 /*
  * The MIT License
  *
- * Copyright 2018 Sergey Pershin <sergey dot pershin at hotmail dot com>.
+ * Copyright (c) 2015-2019 Sergey Pershin
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,10 +31,10 @@
  * @link    http://www.renderpage.org/
  * @author  Sergey Pershin <sergey dot pershin at hotmail dot com>
  * @package RenderPage
- * @version 1.0.0
+ * @version 1.0.0-alpha
  */
 
-namespace renderpage\libs;
+namespace vendor\pershin\renderpage;
 
 /**
  * This is Route class

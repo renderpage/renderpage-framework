@@ -1,3 +1,7 @@
+<?php
+
+use vendor\pershin\renderpage\RenderPage;
+?>
 <!DOCTYPE html>
 <html lang="en-us">
   <head>
@@ -43,6 +47,6 @@
   <body>
     <?= $this->workarea ?>
     <hr>
-    <p>RenderPage <?= \renderpage\libs\RenderPage::RENDERPAGE_VERSION ?></p>
+    <p>RenderPage <?= RenderPage::RENDERPAGE_VERSION ?></p>
   </body>
 </html>

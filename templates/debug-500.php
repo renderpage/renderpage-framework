@@ -22,7 +22,7 @@
         <span class="class"><?= $step['class'] ?? '' ?></span><!--
         --><span class="type"><?= $step['type'] ?? '' ?></span><!--
         --><span class="function"><?= $step['function'] ?></span><!--
-        --><span class="args">(<?= count($step['args']) ? '...' : '' ?>)</span>
+        --><span class="args">(<?= !empty($step['args']) ? '...' : '' ?>)</span>
       </li>
       <?php
   endforeach;

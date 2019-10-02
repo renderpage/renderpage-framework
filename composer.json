@@ -1,0 +1,21 @@
+{
+    "name": "pershin/renderpage",
+    "description": "RenderPage",
+    "version": "1.0.0-alpha",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sergey Pershin",
+            "email": "sergey.pershin@hotmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0"
+    },
+    "autoload": {
+        "files": [
+            "require.php"
+        ]
+    }
+}

@@ -3,7 +3,7 @@
 /*
  * The MIT License
  *
- * Copyright 2018 Sergey Pershin <sergey dot pershin at hotmail dot com>.
+ * Copyright (c) 2015-2019 Sergey Pershin
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,39 +39,56 @@ if (!defined('RENDERPAGE_DIR')) {
 }
 
 /**
+ * Absolute path to project directory.
+ */
+if (!defined('RENDERPAGE_PROJECT_DIR')) {
+    define('RENDERPAGE_PROJECT_DIR', dirname(dirname(dirname(__DIR__))));
+}
+
+/**
  * Absolute path to application files.
  */
 if (!defined('APP_DIR')) {
-    define('APP_DIR', dirname(__DIR__) . '/app');
+    define('APP_DIR', RENDERPAGE_PROJECT_DIR . DIRECTORY_SEPARATOR . 'app');
+}
+
+/**
+ * Debug mode
+ */
+if (RENDERPAGE_DEBUG) {
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
 }
 
 /**
  * Load always needed external class files
  */
-require_once RENDERPAGE_DIR . '/traits/Singleton.php';
-require_once RENDERPAGE_DIR . '/Request.php';
-require_once RENDERPAGE_DIR . '/Route.php';
-require_once RENDERPAGE_DIR . '/Session.php';
-require_once RENDERPAGE_DIR . '/Language.php';
-require_once RENDERPAGE_DIR . '/DB.php';
-require_once RENDERPAGE_DIR . '/Model.php';
-require_once RENDERPAGE_DIR . '/View.php';
-require_once RENDERPAGE_DIR . '/Controller.php';
+require_once RENDERPAGE_DIR . DIRECTORY_SEPARATOR . 'traits'
+        . DIRECTORY_SEPARATOR . 'Singleton.php';
+require_once RENDERPAGE_DIR . DIRECTORY_SEPARATOR . 'Request.php';
+require_once RENDERPAGE_DIR . DIRECTORY_SEPARATOR . 'Route.php';
+require_once RENDERPAGE_DIR . DIRECTORY_SEPARATOR . 'Session.php';
+require_once RENDERPAGE_DIR . DIRECTORY_SEPARATOR . 'Language.php';
+require_once RENDERPAGE_DIR . DIRECTORY_SEPARATOR . 'DB.php';
+require_once RENDERPAGE_DIR . DIRECTORY_SEPARATOR . 'Model.php';
+require_once RENDERPAGE_DIR . DIRECTORY_SEPARATOR . 'View.php';
+require_once RENDERPAGE_DIR . DIRECTORY_SEPARATOR . 'Controller.php';
 
 /**
  * Autoloader
  */
 spl_autoload_register(function ($class) {
-    if (0 === strpos($class, 'renderpage\libs\\')) {
-        $filename = RENDERPAGE_DIR . DIRECTORY_SEPARATOR . substr(strtr($class, '\\', DIRECTORY_SEPARATOR), strlen('renderpage\libs\\')) . '.php';
-    } else {
-        $filename = dirname(APP_DIR) . DIRECTORY_SEPARATOR . strtr($class, '\\', DIRECTORY_SEPARATOR) . '.php';
-    }
+    $filename = RENDERPAGE_PROJECT_DIR . DIRECTORY_SEPARATOR
+            . strtr($class, '\\', DIRECTORY_SEPARATOR) . '.php';
     include_once $filename;
 });
 
-/**
- * Errors
- */
-set_exception_handler(['\renderpage\libs\exceptions\RenderPageException', 'exceptionHandler']);
-set_error_handler(['\renderpage\libs\exceptions\RenderPageException', 'errorHandler']);
+set_exception_handler([
+    'vendor\pershin\renderpage\exceptions\RenderPageException',
+    'exceptionHandler'
+]);
+
+set_error_handler([
+    'vendor\pershin\renderpage\exceptions\RenderPageException',
+    'errorHandler'
+]);
